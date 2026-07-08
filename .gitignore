@@ -1,3 +1,21 @@
+#——————— PROJECT ——————————————————————
+/data/raw/
+/notebooks/
+/submission/
+/docs/
+# no big stuffs
+*.tar.gz
+# *.npy
+*.zip
+*.npz
+*.pth
+*.pt
+*.pkl
+*.joblib
+*.mp4
+*.mov
+
+#———————— BASE ——————————————————————
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
