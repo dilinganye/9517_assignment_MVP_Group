@@ -9,6 +9,33 @@
 - 当某次 PR 涉及重要流程、公共约定、交付说明或需要留痕的决策时，再手动更新 `log.md` 或本文档。
 - 开 PR 前仍建议运行轻量检查：`python scripts/smoke_test.py`。
 
+## 手动记录格式
+
+当需要在 `log.md` 或本文档中记录重要 PR 时，建议使用以下格式：
+
+```md
+## PR #<编号> - <标题>
+
+- 作者：xuanzhougu
+- 分支：`<branch-name>`
+- PR 创建时间：YYYY-MM-DD HH:MM:SS AEST
+- PR 合并时间：YYYY-MM-DD HH:MM:SS AEST
+- 摘要：...
+- 验证：...
+```
+
+## 基础设施 PR 时间线
+
+| PR | 标题 | 作者 | 分支 | 创建时间 (AEST) | 合并时间 (AEST) |
+| ---: | --- | --- | --- | --- | --- |
+| #1 | Add project infrastructure skeleton: Fix requirements.txt and Add README.md as placeholder | xuanzhougu | `xuanzhou-infra-supplement` | 2026-07-08 22:57:31 | 2026-07-08 22:57:48 |
+| #2 | Stabilize data path convention | xuanzhougu | `xuanzhou-data-path-log` | 2026-07-08 23:05:36 | 2026-07-08 23:09:11 |
+| #3 | Add unified dataset loader | xuanzhougu | `xuanzhou-dataset-loader` | 2026-07-08 23:15:32 | 2026-07-08 23:17:22 |
+| #4 | Add lightweight smoke test | xuanzhougu | `xuanzhou-smoke-test` | 2026-07-08 23:21:13 | 2026-07-08 23:23:56 |
+| #5 | Add manifest summary script | xuanzhougu | `xuanzhou-data-processing-script` | 2026-07-08 23:28:44 | 2026-07-08 23:31:45 |
+| #6 | Add minimal CI | xuanzhougu | `xuanzhou-minimal-ci` | 2026-07-08 23:36:35 | 2026-07-08 23:37:31 |
+| #7 | Polish README files | xuanzhougu | `xuanzhou-readme-polish` | 2026-07-08 23:45:37 | 2026-07-09 00:51:42 |
+
 ## 原始仓库状态
 
 原始仓库已经完成了最关键的数据准备工作：

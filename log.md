@@ -4,55 +4,83 @@ This file is an optional project record. Routine PRs do not need automatic entri
 
 ## PR Harness
 
-- Every PR must keep implementation changes as small as practical.
+- Keep each PR as small and focused as practical.
 - Prefer one focused behavior change per PR.
 - Avoid unrelated cleanup, broad refactors, or formatting churn.
 - Update this log only when the PR needs a durable project record.
 
-## Stabilize data path convention
+When this file is updated, use this format:
 
-- Previous PR title: `Add project infrastructure skeleton: Fix requirements.txt and Add README.md as placeholder`
+```md
+## PR #<number> - <title>
+
+- Author: xuanzhougu
+- Branch: `<branch-name>`
+- PR created: YYYY-MM-DD HH:MM:SS AEST
+- PR merged: YYYY-MM-DD HH:MM:SS AEST
+- Summary: ...
+- Validation: ...
+```
+
+## PR #1 - Add project infrastructure skeleton: Fix requirements.txt and Add README.md as placeholder
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-infra-supplement`
+- PR created: 2026-07-08 22:57:31 AEST
+- PR merged: 2026-07-08 22:57:48 AEST
+- Summary: add the first infrastructure skeleton, including `requirements.txt`, lightweight README placeholders, and output ignore rules.
+- Validation: `git diff --check` and Python compile checks passed before push.
+
+## PR #2 - Stabilize data path convention
+
+- Author: xuanzhougu
 - Branch: `xuanzhou-data-path-log`
+- PR created: 2026-07-08 23:05:36 AEST
+- PR merged: 2026-07-08 23:09:11 AEST
 - Summary: align the shared split directory with the committed `data/processed/` manifests and add explicit constants for `class_list_500.csv`, `train.csv`, `val.csv`, and `test.csv`.
-- Harness: this log is now the required lightweight PR record; future PRs should update it with their own entry.
 - Validation: `git diff --check`, `python3 -m compileall src/config.py`, and config path existence checks passed.
 
-## Add unified dataset loader
+## PR #3 - Add unified dataset loader
 
-- Previous PR title: `Stabilize data path convention`
+- Author: xuanzhougu
 - Branch: `xuanzhou-dataset-loader`
+- PR created: 2026-07-08 23:15:32 AEST
+- PR merged: 2026-07-08 23:17:22 AEST
 - Summary: add a shared CSV-backed iNaturalist Dataset, split-to-manifest helper, and thin DataLoader factory for future traditional and deep learning work.
-- Harness: adds the minimal-implementation rule above and follows it by limiting this PR to data loading infrastructure only.
 - Validation: `git diff --check`, `py_compile` for data/config modules, and CSV required-column checks passed. Full DataLoader iteration still requires installed project dependencies and local image data.
 
-## Add lightweight smoke test
+## PR #4 - Add lightweight smoke test
 
-- Previous PR title: `Add unified dataset loader`
+- Author: xuanzhougu
 - Branch: `xuanzhou-smoke-test`
+- PR created: 2026-07-08 23:21:13 AEST
+- PR merged: 2026-07-08 23:23:56 AEST
 - Summary: add a standard-library smoke test for shared config paths, CSV schema, expected split sizes, per-class counts, and split overlap.
-- Harness: keeps the first smoke test minimal and dependency-light so it can run before heavier training setup.
 - Validation: `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
 
-## Add manifest summary script
+## PR #5 - Add manifest summary script
 
-- Previous PR title: `Add lightweight smoke test`
+- Author: xuanzhougu
 - Branch: `xuanzhou-data-processing-script`
+- PR created: 2026-07-08 23:28:44 AEST
+- PR merged: 2026-07-08 23:31:45 AEST
 - Summary: add a standard-library script that summarizes the committed data manifests produced from the data notebooks.
-- Harness: keeps notebook-to-script work minimal by documenting and summarizing existing manifests instead of reprocessing large raw archives.
 - Validation: `python scripts/summarize_data_manifests.py`, `--output` JSON write/read check, `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
 
-## Add minimal CI
+## PR #6 - Add minimal CI
 
-- Previous PR title: `Add manifest summary script`
+- Author: xuanzhougu
 - Branch: `xuanzhou-minimal-ci`
+- PR created: 2026-07-08 23:36:35 AEST
+- PR merged: 2026-07-08 23:37:31 AEST
 - Summary: add a GitHub Actions workflow that runs only dependency-light checks for PRs and pushes to `main`.
-- Harness: keeps CI minimal by avoiding dependency installation, image downloads, model training, and full evaluation.
 - Validation: local CI-equivalent commands passed: `py_compile`, `python scripts/smoke_test.py`, `python scripts/summarize_data_manifests.py --output ...`, and `git diff --check`.
 
-## Current PR - Polish README files
+## PR #7 - Polish README files
 
-- Previous PR title: `Add minimal CI`
+- Author: xuanzhougu
 - Branch: `xuanzhou-readme-polish`
+- PR created: 2026-07-08 23:45:37 AEST
+- PR merged: 2026-07-09 00:51:42 AEST
 - Summary: fix README formatting, remove outdated draft wording, align processed data documentation with committed files, expand the root README with current project entry points, add Chinese explanations, preserve useful original data-processing notes, and add a Chinese infrastructure PR summary.
-- Harness: keeps the final documentation pass focused on README and project log updates only.
 - Validation: `python scripts/smoke_test.py`, `python scripts/summarize_data_manifests.py --output ...`, README cleanup search, and `git diff --check` passed.
