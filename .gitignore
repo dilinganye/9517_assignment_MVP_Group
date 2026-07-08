@@ -3,6 +3,8 @@
 /notebooks/
 /submission/
 /docs/
+/outputs/*
+!/outputs/README.md
 # no big stuffs
 *.tar.gz
 # *.npy

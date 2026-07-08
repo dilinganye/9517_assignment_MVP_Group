@@ -1,0 +1,20 @@
+# Core data processing
+ijson
+joblib
+numpy
+pandas
+tqdm
+
+# Classical computer vision and evaluation
+matplotlib
+opencv-python
+Pillow
+scikit-image
+scikit-learn
+
+# Deep learning
+torch
+torchvision
+
+# Configuration
+PyYAML
