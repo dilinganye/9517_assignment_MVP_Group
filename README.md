@@ -19,6 +19,12 @@ Run the lightweight project check before opening a PR:
 python scripts/smoke_test.py
 ```
 
+To summarize the committed data manifests that came from the data notebooks:
+
+```bash
+python scripts/summarize_data_manifests.py
+```
+
 
 ## 项目结构 ##
 comp9517-26t2-group-project/    # 仓库根目录

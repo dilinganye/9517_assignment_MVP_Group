@@ -25,10 +25,18 @@ Every PR must add a short entry to this file before review. Keep entries concise
 - Harness: adds the minimal-implementation rule above and follows it by limiting this PR to data loading infrastructure only.
 - Validation: `git diff --check`, `py_compile` for data/config modules, and CSV required-column checks passed. Full DataLoader iteration still requires installed project dependencies and local image data.
 
-## Current PR - Add lightweight smoke test
+## Add lightweight smoke test
 
 - Previous PR title: `Add unified dataset loader`
 - Branch: `xuanzhou-smoke-test`
 - Summary: add a standard-library smoke test for shared config paths, CSV schema, expected split sizes, per-class counts, and split overlap.
 - Harness: keeps the first smoke test minimal and dependency-light so it can run before heavier training setup.
 - Validation: `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
+
+## Current PR - Add manifest summary script
+
+- Previous PR title: `Add lightweight smoke test`
+- Branch: `xuanzhou-data-processing-script`
+- Summary: add a standard-library script that summarizes the committed data manifests produced from the data notebooks.
+- Harness: keeps notebook-to-script work minimal by documenting and summarizing existing manifests instead of reprocessing large raw archives.
+- Validation: `python scripts/summarize_data_manifests.py`, `--output` JSON write/read check, `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
