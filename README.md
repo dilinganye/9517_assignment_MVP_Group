@@ -12,6 +12,13 @@ data - 项目整体包含许多大块，包括但不限于
 - 如果想要流程可视化，使用tqdm
  pip install tqdm
 
+## Smoke test ##
+Run the lightweight project check before opening a PR:
+
+```bash
+python scripts/smoke_test.py
+```
+
 
 ## 项目结构 ##
 comp9517-26t2-group-project/    # 仓库根目录

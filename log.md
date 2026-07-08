@@ -17,10 +17,18 @@ Every PR must add a short entry to this file before review. Keep entries concise
 - Harness: this log is now the required lightweight PR record; future PRs should update it with their own entry.
 - Validation: `git diff --check`, `python3 -m compileall src/config.py`, and config path existence checks passed.
 
-## Current PR - Add unified dataset loader
+## Add unified dataset loader
 
 - Previous PR title: `Stabilize data path convention`
 - Branch: `xuanzhou-dataset-loader`
 - Summary: add a shared CSV-backed iNaturalist Dataset, split-to-manifest helper, and thin DataLoader factory for future traditional and deep learning work.
 - Harness: adds the minimal-implementation rule above and follows it by limiting this PR to data loading infrastructure only.
 - Validation: `git diff --check`, `py_compile` for data/config modules, and CSV required-column checks passed. Full DataLoader iteration still requires installed project dependencies and local image data.
+
+## Current PR - Add lightweight smoke test
+
+- Previous PR title: `Add unified dataset loader`
+- Branch: `xuanzhou-smoke-test`
+- Summary: add a standard-library smoke test for shared config paths, CSV schema, expected split sizes, per-class counts, and split overlap.
+- Harness: keeps the first smoke test minimal and dependency-light so it can run before heavier training setup.
+- Validation: `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
