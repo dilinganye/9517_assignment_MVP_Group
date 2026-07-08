@@ -37,7 +37,11 @@ TEST_ANNOTATION_FILE = DATA_RAW_ROOT / "val.json"
 
     # DATA_PROCESSED_ROOT 处理后的数据目录（划分好的标签文件等，Git提交）
 DATA_PROCESSED_ROOT = PROJECT_ROOT / "data" / "processed"
-DATA_SPLITS_DIR = DATA_PROCESSED_ROOT / "splits"  # 数据集划分文件
+DATA_SPLITS_DIR = DATA_PROCESSED_ROOT  # 数据集划分文件
+CLASS_LIST_CSV = DATA_SPLITS_DIR / "class_list_500.csv"
+TRAIN_CSV = DATA_SPLITS_DIR / "train.csv"
+VAL_CSV = DATA_SPLITS_DIR / "val.csv"
+TEST_CSV = DATA_SPLITS_DIR / "test.csv"
 
 # OUTPUT_ROOT 输出目录（本地生成，Git忽略）
 OUTPUT_ROOT = PROJECT_ROOT / "outputs"
