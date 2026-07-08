@@ -17,7 +17,7 @@ data - 项目整体包含许多大块，包括但不限于
 comp9517-26t2-group-project/    # 仓库根目录
 ├── README.md                   # 项目说明 [你正在看这个]
 ├── .git....                    # github的各种文件和文件夹，忽略
-├── requirements.txt            # 全项目依赖与版本号，如果要的话，不过我懒了
+├── requirements.txt            # 全项目依赖
 │
 ├── data/                       # 外层数据目录（原始数据+处理好的数据）
 │
@@ -49,6 +49,7 @@ comp9517-26t2-group-project/    # 仓库根目录
 /notebooks/ [具体项目的notebooks会在src内部，外置在此处的都为调参和测试用品，不会进入项目文件的github]
 /submission/ [此项目只由固定人员上传，以防误触覆盖]
 /docs/ [开发过程，建议每人都准备一下，从而留痕方便最终答辩]
+/outputs/* [本地实验输出默认不提交，保留 outputs/README.md 说明目录用途]
 *.tar.gz [Github限制]
 *.zip
 *.npz
