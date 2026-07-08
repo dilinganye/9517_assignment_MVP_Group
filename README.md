@@ -1,77 +1,144 @@
-# 说明 -提交时此段会删除- #
-data - 项目整体包含许多大块，包括但不限于
-- 数据：“数据源[大概会外置，太大了这东西]”，“索引表[CSV]”，“处理中介[可能的某些数据导出]”
-- 方法：“基础实现[各种传统视觉方法]”，“深度实现[各种分析和深度学习]”，“进阶实现[加分项的部分]”
-- 模型：“模型培养[需要大量用到各种专门的分支]”
+# COMP9517 2026 T2 Group Project
 
+This repository contains the shared code and lightweight data manifests for the COMP9517 group project on iNaturalist-2021 species classification.
 
+本仓库用于保存 COMP9517 小组项目的共享代码和轻量数据清单，任务是基于 iNaturalist-2021 做物种图像分类。
 
-## 小组提示表 ##
-- 无论如何，记得安装 ijson，这处理数据需求太大了，尤其是我这数据清洗，不流式真会把我电脑干碎
- pip install ijson
-- 如果想要流程可视化，使用tqdm
- pip install tqdm
+The project currently uses a fixed 500-class subset:
 
-## Smoke test ##
+- `train.csv`: 20,000 images, 500 classes, 40 images per class.
+- `val.csv`: 5,000 images, 500 classes, 10 images per class.
+- `test.csv`: 5,000 images, 500 classes, 10 images per class from the official validation split.
+
+当前项目使用固定的 500 类子集：
+
+- `train.csv`: 20,000 张图片，500 类，每类 40 张。
+- `val.csv`: 5,000 张图片，500 类，每类 10 张。
+- `test.csv`: 5,000 张图片，500 类，每类 10 张，来自官方 validation split。
+
+Large raw images and generated experiment outputs are intentionally not committed.
+
+大型原始图片和实验生成结果默认不提交到 Git。
+
+## Quick Start
+
+Install project dependencies:
+
+安装项目依赖：
+
+```bash
+pip install -r requirements.txt
+```
+
 Run the lightweight project check before opening a PR:
+
+开 PR 前运行轻量项目检查：
 
 ```bash
 python scripts/smoke_test.py
 ```
 
-The same lightweight checks also run in GitHub Actions for pull requests and pushes to `main`.
+Summarize the committed data manifests that came from the data notebooks:
 
-To summarize the committed data manifests that came from the data notebooks:
+汇总由数据处理 notebook 生成并已提交的数据清单：
 
 ```bash
 python scripts/summarize_data_manifests.py
 ```
 
+The same lightweight checks run in GitHub Actions for pull requests and pushes to `main`.
 
-## 项目结构 ##
-comp9517-26t2-group-project/    # 仓库根目录
-├── README.md                   # 项目说明 [你正在看这个]
-├── .git....                    # github的各种文件和文件夹，忽略
-├── requirements.txt            # 全项目依赖
-│
-├── data/                       # 外层数据目录（原始数据+处理好的数据）
-│
-├── src/                        # 核心源代码（模块化，全员协作开发）
-│   │
-│   ├── config.py               # 全局参数：随机种子、每类样本数等，所有人都得引用这里的数据从而保证项目统一
-│   │
-│   ├── data/                   # 数据模块
-│   │
-│   ├── traditional/            # 传统计算机视觉方法
-│   │
-│   ├── deep_learning/          # 深度学习方法
-│   │
-│   ├── advanced/               # 进阶研究方向（每个方向也要独立子目录）
-│   │
-│   ├── utils/                  # 通用工具，一些比较方便的方法或者库什么的
-│
-├── notebooks/                  # 实验 Notebook（仅做调用与可视化，不会上传到github）
-│   ├── abababab
-│
-├── docs/                       # 个人留痕（不会上传到github）
-│
-├── outputs/                    # 输出目录（一些算法什么的可以把结果扔在这儿，扔在自己的开发目录也可以）
-│
-└── submission/                 # 最终打包（Git 完全忽略）
+同一组轻量检查也会在 GitHub Actions 中对 PR 和推送到 `main` 的提交自动运行。
 
-## gitignore ##
-/data/raw/ [因为过大]
-/notebooks/ [具体项目的notebooks会在src内部，外置在此处的都为调参和测试用品，不会进入项目文件的github]
-/submission/ [此项目只由固定人员上传，以防误触覆盖]
-/docs/ [开发过程，建议每人都准备一下，从而留痕方便最终答辩]
-/outputs/* [本地实验输出默认不提交，保留 outputs/README.md 说明目录用途]
-*.tar.gz [Github限制]
-*.zip
-*.npz
-*.pth
-*.pt
-*.pkl
-*.joblib
-*.mp4
-*.mov
-... [若有需求，请自行添加]
+## Data Processing Notes
+
+数据处理提示：
+
+- 原始 iNaturalist 标注和图片压缩包很大，处理 JSON 标注时应优先使用流式读取，避免一次性读入内存。
+- `ijson` 用于流式解析大型 JSON 标注文件。
+- `tqdm` 可用于长时间数据处理任务的进度显示。
+- 这些依赖已经写入 `requirements.txt`，通常只需要运行 `pip install -r requirements.txt`。
+
+## Data Layout
+
+Raw iNaturalist files should be placed locally under `data/raw/`, which is ignored by Git:
+
+原始 iNaturalist 文件应放在本地 `data/raw/` 下；该目录被 Git 忽略：
+
+```text
+data/raw/
+|-- train_mini/
+|-- val/
+|-- train_mini.tar.gz
+|-- train_mini.json.tar.gz
+|-- val.tar.gz
+`-- val.json.tar.gz
+```
+
+Committed data manifests live in `data/processed/`.
+
+已提交的数据清单位于 `data/processed/`。
+
+## Git Ignore Policy
+
+忽略规则说明：
+
+- `data/raw/`：原始数据和解压图片体积过大，不提交。
+- `outputs/`：本地实验输出默认不提交，只保留 `outputs/README.md` 说明目录用途。
+- `notebooks/`、`docs/`、`submission/`：组内临时实验、个人留痕和最终打包目录默认不提交。
+- `*.tar.gz`、`*.zip`、`*.npz`、`*.pth`、`*.pt`、`*.pkl`、`*.joblib`、`*.mp4`、`*.mov`：大型压缩包、模型权重、缓存和视频默认不提交。
+
+## Project Structure
+
+```text
+.
+|-- .github/workflows/       # Lightweight CI
+|-- data/
+|   |-- processed/           # Committed CSV manifests
+|   `-- raw/                 # Local raw data, ignored by Git
+|-- outputs/                 # Local experiment outputs, ignored by Git except README
+|-- scripts/                 # Lightweight project checks and manifest scripts
+|-- src/
+|   |-- advanced/            # Advanced directions such as Grad-CAM or robustness
+|   |-- data/                # Dataset and DataLoader utilities
+|   |-- deep_learning/       # CNN models and training code
+|   |-- traditional/         # Handcrafted features and classical classifiers
+|   `-- utils/               # Shared helpers
+|-- log.md                   # Required PR log
+|-- PR_SUMMARY_CN.md         # Chinese infrastructure summary
+`-- requirements.txt
+```
+
+## Collaboration Rules
+
+- Keep each PR focused on one small change.
+- Update `log.md` or `PR_SUMMARY_CN.md` manually when a PR needs an important record; routine PRs do not need automatic log entries.
+- Run `python scripts/smoke_test.py` before opening a PR.
+- Do not commit raw data, model checkpoints, generated media, or large experiment outputs.
+- Use `src/config.py` for shared paths, random seed, image size, and split constants.
+
+协作规则：
+
+- 每个 PR 尽量只处理一个小改动。
+- 只有当 PR 需要记录重要流程、公共约定或交付说明时，才手动更新 `log.md` 或 `PR_SUMMARY_CN.md`；普通 PR 不需要自动写日志。
+- 开 PR 前运行 `python scripts/smoke_test.py`。
+- 不提交原始数据、模型 checkpoint、生成媒体或大型实验输出。
+- 共享路径、随机种子、图片尺寸和 split 常量统一使用 `src/config.py`。
+
+## Current Lightweight CI
+
+The current GitHub Actions workflow only checks the project foundation:
+
+- Python syntax for lightweight scripts and config.
+- Data manifest consistency through `scripts/smoke_test.py`.
+- Manifest summary generation through `scripts/summarize_data_manifests.py`.
+
+Full training, model evaluation, Grad-CAM, and robustness experiments should run outside CI.
+
+当前 GitHub Actions 只检查项目基础：
+
+- 轻量脚本和配置文件的 Python 语法。
+- 通过 `scripts/smoke_test.py` 检查数据清单一致性。
+- 通过 `scripts/summarize_data_manifests.py` 生成数据清单摘要。
+
+完整训练、模型评估、Grad-CAM 和鲁棒性实验应在 CI 之外运行。
