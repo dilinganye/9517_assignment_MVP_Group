@@ -19,6 +19,8 @@ Run the lightweight project check before opening a PR:
 python scripts/smoke_test.py
 ```
 
+The same lightweight checks also run in GitHub Actions for pull requests and pushes to `main`.
+
 To summarize the committed data manifests that came from the data notebooks:
 
 ```bash

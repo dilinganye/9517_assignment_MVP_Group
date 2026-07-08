@@ -33,10 +33,18 @@ Every PR must add a short entry to this file before review. Keep entries concise
 - Harness: keeps the first smoke test minimal and dependency-light so it can run before heavier training setup.
 - Validation: `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
 
-## Current PR - Add manifest summary script
+## Add manifest summary script
 
 - Previous PR title: `Add lightweight smoke test`
 - Branch: `xuanzhou-data-processing-script`
 - Summary: add a standard-library script that summarizes the committed data manifests produced from the data notebooks.
 - Harness: keeps notebook-to-script work minimal by documenting and summarizing existing manifests instead of reprocessing large raw archives.
 - Validation: `python scripts/summarize_data_manifests.py`, `--output` JSON write/read check, `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
+
+## Current PR - Add minimal CI
+
+- Previous PR title: `Add manifest summary script`
+- Branch: `xuanzhou-minimal-ci`
+- Summary: add a GitHub Actions workflow that runs only dependency-light checks for PRs and pushes to `main`.
+- Harness: keeps CI minimal by avoiding dependency installation, image downloads, model training, and full evaluation.
+- Validation: local CI-equivalent commands passed: `py_compile`, `python scripts/smoke_test.py`, `python scripts/summarize_data_manifests.py --output ...`, and `git diff --check`.

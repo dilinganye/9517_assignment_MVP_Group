@@ -1,0 +1,32 @@
+name: Minimal CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Compile lightweight Python modules
+        run: |
+          python -m py_compile scripts/smoke_test.py scripts/summarize_data_manifests.py src/config.py
+
+      - name: Run manifest smoke test
+        run: |
+          python scripts/smoke_test.py
+
+      - name: Summarize data manifests
+        run: |
+          python scripts/summarize_data_manifests.py --output /tmp/manifest_summary.json
