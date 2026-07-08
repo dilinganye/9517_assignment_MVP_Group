@@ -1,89 +1,88 @@
-# tiny_inat_500.tar.gz #
+# Processed Data Manifests
 
-tiny_inat_500.tar.gz. is around 2.5GB, can't store in Github, thus it been stored in a cloudDrive
-However, for convenient with later confirmation, the CSV files are still displayed in this Folder.
+This directory contains the committed CSV manifests for the selected 500-class iNaturalist-2021 subset.
 
-It's been stored in: 
-https://unsw-my.sharepoint.com/:u:/g/personal/z5708767_ad_unsw_edu_au/IQCd2kjjFMcQQZvZZBUCLM74AUqhSjweb5B1IQGVrewxcrQ?e=5OEx5p
+本目录保存已提交的 CSV 数据清单，对应当前选定的 iNaturalist-2021 500 类子集。
 
-## desc ##
-~ 文件格式 ~
-~ This file format is: ~
+The full image archive is not stored in Git. The current packaged subset is around 2.5 GB and is stored externally:
 
+完整图片压缩包不存放在 Git 中。当前打包好的子集约 2.5 GB，存放在外部链接：
+
+<https://unsw-my.sharepoint.com/:u:/g/personal/z5708767_ad_unsw_edu_au/IQCd2kjjFMcQQZvZZBUCLM74AUqhSjweb5B1IQGVrewxcrQ?e=5OEx5p>
+
+## Committed Files
+
+- `class_list_500.csv`: selected class metadata, including `category_id`, `category_name`, `common_name`, `kingdom`, and `supercategory`.
+- `train.csv`: training manifest with `file_path`, `label`, `category_id`, and `category_name`.
+- `val.csv`: validation manifest with the same columns as `train.csv`.
+- `test.csv`: held-out test manifest based on the official iNaturalist validation split.
+
+已提交文件：
+
+- `class_list_500.csv`: 最终抽中的 500 个类别元信息，包括 `category_id`、`category_name`、`common_name`、`kingdom` 和 `supercategory`。
+- `train.csv`: 训练集清单，包含 `file_path`、`label`、`category_id` 和 `category_name`。
+- `val.csv`: 验证集清单，字段与 `train.csv` 相同。
+- `test.csv`: 独立测试集清单，基于官方 iNaturalist validation split。
+
+The notebook that created these manifests also used a label mapping internally. A standalone `label_mapping.json` is not currently committed.
+
+生成这些清单的 notebook 内部使用了 label mapping；目前没有单独提交 `label_mapping.json` 文件。
+
+## 中文文件用途说明
+
+- `class_list_500.csv` 用于列出最终抽中的 500 个类别。它保存类别元信息，主要包括 `category_id`、`category_name`、`common_name`、`kingdom` 和 `supercategory`，相当于当前 500 类实验子集的总目录。
+- label mapping 的作用是保存“原始类别 ID”和“训练标签编号”的对应关系。模型训练时使用连续编号 `label`，后续分析时可以通过映射还原到原始物种类别。当前映射关系已经体现在各 CSV 的 `category_id` 和 `label` 字段中，但没有单独提交 `label_mapping.json`。
+- `train.csv` 是训练集清单。每一行对应一张训练图片，包含图片相对路径、训练标签、原始类别 ID 和类别名，用于模型训练阶段读取样本。
+- `val.csv` 是验证集清单。字段与 `train.csv` 相同，用于训练过程中的验证、调参和选择 checkpoint。
+- `test.csv` 是独立测试集清单。它基于官方 iNaturalist validation split，用于最终固定方案的测试评估；不应在训练调参阶段反复使用。
+
+## Expected Split Sizes
+
+| Split | Rows | Classes | Images per class |
+| --- | ---: | ---: | ---: |
+| `train.csv` | 20,000 | 500 | 40 |
+| `val.csv` | 5,000 | 500 | 10 |
+| `test.csv` | 5,000 | 500 | 10 |
+
+预期划分规模：
+
+| 划分 | 行数 | 类别数 | 每类图片数 |
+| --- | ---: | ---: | ---: |
+| `train.csv` | 20,000 | 500 | 40 |
+| `val.csv` | 5,000 | 500 | 10 |
+| `test.csv` | 5,000 | 500 | 10 |
+
+## Packaged Subset Layout
+
+```text
 tiny_inat_500.tar.gz
-    |L annotations
-    |   |F class_list_500.csv
-    |   |F label_mapping.json
-    |   |F test.csv
-    |   |F train.csv
-    |   |F val.csv
-    |L train_mini
-    |   |L 00006_Animalia_Arthropoda_Arachnida_Araneae_Araneidae_Aculepeira_ceropegia
-    |   |   |F 0acbaf31-89b2-4768-8bd3-bf279a7b2f60.jpg
-    |   |   |F ...
-    |   |L 00079_Animalia_Arthropoda_Arachnida_Araneae_Salticidae_Helpis_minitabunda
-    |   |L ...
-    |L val
-    |   |L 00006_Animalia_Arthropoda_Arachnida_Araneae_Araneidae_Aculepeira_ceropegia
-    |   |   |F 4f539364-22bd-4215-a264-dbdae49330a8.jpg
-    |   |   |F ...
-    |   |L 00079_Animalia_Arthropoda_Arachnida_Araneae_Salticidae_Helpis_minitabunda
-    |   |L ...
+|-- annotations/
+|   |-- class_list_500.csv
+|   |-- test.csv
+|   |-- train.csv
+|   `-- val.csv
+|-- train_mini/
+|   |-- 00006_Animalia_Arthropoda_Arachnida_Araneae_Araneidae_Aculepeira_ceropegia/
+|   `-- ...
+`-- val/
+    |-- 00006_Animalia_Arthropoda_Arachnida_Araneae_Araneidae_Aculepeira_ceropegia/
+    `-- ...
+```
 
-________________________________________
-        说         明
-________________________________________
-    |   |F class_list_500.csv
-作用是列出最终抽中的 500 个类别。里面保存的是类别元信息，主要包括 category_id、category_name、common_name、kingdom、supercategory。它相当于这 500 类的总目录。
+## Script Evidence
 
-    |   |F label_mapping.json
-作用是保存“原始类别 ID”和“训练标签编号”的对应关系。
-在src/data/data00_choosing500.ipynb 里面的 category_to_label 表示原始 category_id -> label，label_to_category 则是反过来。
-这个文件的意义是：模型训练时用的是连续编号 label，但后面也可以还原回原始物种 ID。
+Summarize the committed notebook outputs with:
 
-    |   |F test.csv
-作用是测试集清单，里面每一行对应一张训练图片，通常包含 file_path、label、category_id，并补了 category_name。
-它记录测试阶段要用的图片及其对应标签。
-    |   |F train.csv
-作用是训练集清单。字段一样。
-它告诉你训练时每张图应该读哪一个类别。
-    |   |F val.csv
-作用是验证集清单，字段和另外那俩也是一样。
-它用来做验证集评估，标签编号和训练集是同一套映射。
-
-________________________________________
-Explanation
-________________________________________
-
-| |F class_list_500.csv
-This file lists the 500 categories selected in the final selection. It stores category metadata, mainly including category_id, category_name, common_name, kingdom, and supercategory. It's essentially a directory of these 500 categories.
-
-| |F label_mapping.json
-This file stores the mapping between "original category ID" and "training label number".
-
-In src/data/data00_choosing500.ipynb, category_to_label represents the original category_id -> label, and label_to_category is the reverse.
-
-The significance of this file is that while the model uses consecutively numbered labels during training, it can later be restored to the original species ID.
-
-| |F test.csv
-This file is a test set list. Each line corresponds to a training image and typically includes file_path, label, category_id, and supplemented with category_name.
-
-It records the images used during the testing phase and their corresponding labels.
-
-| |F train.csv This is a list of training set data. The fields are the same.
-
-It tells you which category each image should be read during training.
-
-| |F val.csv This is a list of validation set data. The fields are the same as the other two.
-
-It's used for validation set evaluation; the label numbers and training set data share the same mapping.
-
-## Script evidence
-
-The notebook outputs can be summarized with:
+用以下命令汇总已提交的 notebook 输出：
 
 ```bash
 python scripts/summarize_data_manifests.py
 ```
 
-This script reports the selected class count, split sizes, per-label counts, kingdom distribution, and split overlap counts from the committed CSV manifests.
+Run the lightweight consistency check with:
+
+用以下命令运行轻量一致性检查：
+
+```bash
+python scripts/smoke_test.py
+```

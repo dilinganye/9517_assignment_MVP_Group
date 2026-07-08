@@ -1,13 +1,13 @@
 # Project Log
 
-Every PR must add a short entry to this file before review. Keep entries concise and include the PR title, branch, summary, and validation notes.
+This file is an optional project record. Routine PRs do not need automatic entries; update it manually when a PR changes an important workflow, shared convention, delivery note, or maintenance decision.
 
 ## PR Harness
 
 - Every PR must keep implementation changes as small as practical.
 - Prefer one focused behavior change per PR.
 - Avoid unrelated cleanup, broad refactors, or formatting churn.
-- Update this log with the PR title, branch, summary, and validation notes.
+- Update this log only when the PR needs a durable project record.
 
 ## Stabilize data path convention
 
@@ -41,10 +41,18 @@ Every PR must add a short entry to this file before review. Keep entries concise
 - Harness: keeps notebook-to-script work minimal by documenting and summarizing existing manifests instead of reprocessing large raw archives.
 - Validation: `python scripts/summarize_data_manifests.py`, `--output` JSON write/read check, `python scripts/smoke_test.py`, `py_compile`, and `git diff --check` passed.
 
-## Current PR - Add minimal CI
+## Add minimal CI
 
 - Previous PR title: `Add manifest summary script`
 - Branch: `xuanzhou-minimal-ci`
 - Summary: add a GitHub Actions workflow that runs only dependency-light checks for PRs and pushes to `main`.
 - Harness: keeps CI minimal by avoiding dependency installation, image downloads, model training, and full evaluation.
 - Validation: local CI-equivalent commands passed: `py_compile`, `python scripts/smoke_test.py`, `python scripts/summarize_data_manifests.py --output ...`, and `git diff --check`.
+
+## Current PR - Polish README files
+
+- Previous PR title: `Add minimal CI`
+- Branch: `xuanzhou-readme-polish`
+- Summary: fix README formatting, remove outdated draft wording, align processed data documentation with committed files, expand the root README with current project entry points, add Chinese explanations, preserve useful original data-processing notes, and add a Chinese infrastructure PR summary.
+- Harness: keeps the final documentation pass focused on README and project log updates only.
+- Validation: `python scripts/smoke_test.py`, `python scripts/summarize_data_manifests.py --output ...`, README cleanup search, and `git diff --check` passed.
