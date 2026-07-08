@@ -77,3 +77,13 @@ It tells you which category each image should be read during training.
 | |F val.csv This is a list of validation set data. The fields are the same as the other two.
 
 It's used for validation set evaluation; the label numbers and training set data share the same mapping.
+
+## Script evidence
+
+The notebook outputs can be summarized with:
+
+```bash
+python scripts/summarize_data_manifests.py
+```
+
+This script reports the selected class count, split sizes, per-label counts, kingdom distribution, and split overlap counts from the committed CSV manifests.
