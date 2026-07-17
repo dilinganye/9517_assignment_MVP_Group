@@ -84,3 +84,12 @@ When this file is updated, use this format:
 - PR merged: 2026-07-09 00:51:42 AEST
 - Summary: fix README formatting, remove outdated draft wording, align processed data documentation with committed files, expand the root README with current project entry points, add Chinese explanations, preserve useful original data-processing notes, and add a Chinese infrastructure PR summary.
 - Validation: `python scripts/smoke_test.py`, `python scripts/summarize_data_manifests.py --output ...`, README cleanup search, and `git diff --check` passed.
+
+## PR #10 - Add scratch ResNet18 factory
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-resnet18`
+- PR created: 2026-07-17 23:46:17 AEST
+- PR merged: pending
+- Summary: add the D-owned factory for a randomly initialized ResNet18 using the shared 500-class setting; no pretrained weights, trainer, checkpoint, or transfer-learning behavior are included.
+- Validation: `git diff --check`, Python syntax compilation, and `python scripts/smoke_test.py` passed. Local model construction was not run because PyTorch is not installed in this environment.
