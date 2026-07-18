@@ -5,6 +5,8 @@ import torch
 from torch import nn
 from torch.optim import Optimizer
 
+from src.deep_learning.checkpoint import save_checkpoint
+
 
 def _run_epoch(model, data_loader, criterion, device, optimizer=None):
     """Run one training or validation epoch and return loss and Top-1 metrics."""
@@ -67,24 +69,46 @@ def fit_scratch_model(
     device,
     epochs: int,
     criterion=None,
+    checkpoint_path=None,
+    start_epoch: int = 0,
+    history=None,
+    best_val_top1=None,
 ):
-    """Train and validate a scratch model, returning per-epoch loss and Top-1."""
+    """Train and validate a scratch model, optionally saving the best checkpoint."""
 
     if epochs < 1:
         raise ValueError("epochs must be at least 1")
+    if start_epoch < 0:
+        raise ValueError("start_epoch must be non-negative")
 
     device = torch.device(device)
     criterion = criterion or nn.CrossEntropyLoss()
     model.to(device)
-    history = {"train_loss": [], "train_top1": [], "val_loss": [], "val_top1": []}
+    history = history or {"train_loss": [], "train_top1": [], "val_loss": [], "val_top1": []}
+    best_val_top1 = (
+        max(history["val_top1"], default=float("-inf"))
+        if best_val_top1 is None
+        else best_val_top1
+    )
 
-    for _ in range(epochs):
+    for epoch in range(start_epoch, start_epoch + epochs):
         train_metrics = train_one_epoch(model, train_loader, optimizer, device, criterion)
         val_metrics = validate_one_epoch(model, val_loader, device, criterion)
         history["train_loss"].append(train_metrics["loss"])
         history["train_top1"].append(train_metrics["top1"])
         history["val_loss"].append(val_metrics["loss"])
         history["val_top1"].append(val_metrics["top1"])
+
+        if checkpoint_path and val_metrics["top1"] > best_val_top1:
+            best_val_top1 = val_metrics["top1"]
+            save_checkpoint(
+                checkpoint_path,
+                epoch,
+                model,
+                optimizer,
+                history,
+                best_val_top1,
+            )
 
     return history
 
