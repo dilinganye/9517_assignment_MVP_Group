@@ -94,6 +94,15 @@ When this file is updated, use this format:
 - Summary: add the D-owned factory for a randomly initialized ResNet18 using the shared 500-class setting; no pretrained weights, trainer, checkpoint, or transfer-learning behavior are included.
 - Validation: `git diff --check`, Python syntax compilation, and `python scripts/smoke_test.py` passed. Local model construction was not run because PyTorch is not installed in this environment.
 
+## PR #15 - Add scratch trainer
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-trainer`
+- PR created: 2026-07-18 22:18:55 AEST
+- PR merged: pending
+- Summary: add minimal scratch-CNN training and validation epochs with cross-entropy, device handling, loss and Top-1 metrics, per-epoch history, and training-curve plotting.
+- Validation: `git diff --check`, Python syntax compilation, two synthetic CPU train/validation epochs with 500-class labels and curve creation, and `python scripts/smoke_test.py` passed.
+
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 
 - Author: Chaohao Liu
