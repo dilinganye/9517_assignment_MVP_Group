@@ -93,3 +93,12 @@ When this file is updated, use this format:
 - PR merged: pending
 - Summary: add the D-owned factory for a randomly initialized ResNet18 using the shared 500-class setting; no pretrained weights, trainer, checkpoint, or transfer-learning behavior are included.
 - Validation: `git diff --check`, Python syntax compilation, and `python scripts/smoke_test.py` passed. Local model construction was not run because PyTorch is not installed in this environment.
+
+## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
+
+- Author: Chaohao Liu
+- Branch: `Chaohao_TraditionalFeature1`
+- PR created: 2026-07-18 13:24 AEST
+- PR merged: 2026-07-18 15:40 AEST
+- Summary: Added `hog.ipynb` for the traditional feature extraction pipeline. The notebook loads sample images using the shared project configuration, resizes them to 224 × 224, converts them to grayscale, extracts HOG features, displays the HOG visualisation, and provides a reusable HOG extraction function.
+- Validation: The notebook ran successfully on sample images from different classes. All tested images produced `float32` HOG feature vectors with the same fixed shape of `(6084,)`.
