@@ -64,7 +64,7 @@ The combined feature contains 6084 HOG values and 96 RGB colour histogram values
 
 ## Shared Configuration
 
-Both notebooks use the shared project configuration:
+All notebooks use the shared project configuration:
 
 ```python
 from src import config
@@ -115,5 +115,3 @@ When adding a new feature:
 - return a one-dimensional `float32` NumPy array
 - keep the output length fixed
 - test the method on images from different classes
-
-The notebook functions will later be moved into `.py` files for use by the full pipeline
