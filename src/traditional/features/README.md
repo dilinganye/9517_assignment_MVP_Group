@@ -101,4 +101,4 @@ When adding a new feature:
 - update this README
 - do not commit raw images or large cache files
 
-The notebook functions will later be moved into `.py` files for use by the full pipeline.
+The notebook functions will later be moved into `.py` files for use by the full pipeline
