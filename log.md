@@ -111,3 +111,12 @@ When this file is updated, use this format:
 - PR merged: 2026-07-18 16:45 AEST
 - Summary: Added `color.ipynb` for colour histogram feature extraction. The notebook loads sample images, resizes them to 224 × 224, calculates a normalised 32-bin histogram for each RGB channel, and combines the three histograms into one feature vector. It also includes a histogram visualisation and a reusable function for later feature extraction.
 - Validation: The notebook ran successfully on images from different classes. Each image produced a `float32` feature vector with shape `(96,)`. The histogram for each RGB channel was normalised to sum to `1.0`, and all tested images produced the same feature length.
+
+## PR #13 - Combined HOG and Colour Feature Extraction
+
+- Author: Chaohao Liu
+- Branch: `Chaohao_TraditionalFeature3`
+- PR created: 2026-07-18 21:34 AEST
+- PR merged: pending
+- Summary: Added `combine.ipynb` to combine the HOG feature and RGB colour histogram into one fixed-length feature vector. The notebook extracts 6084 HOG values and 96 colour histogram values, then concatenates them into a single reusable feature vector using `extract_combined_feature(image)`. It also checks the feature order, output shape, data type, and validity.
+- Validation: The notebook ran successfully on images from different classes. Each image produced a `float32` feature vector with shape `(6180,)`. The HOG and colour sections matched the original feature vectors, all tested images produced the same feature length, and no missing or infinite values were found.There is no error.
