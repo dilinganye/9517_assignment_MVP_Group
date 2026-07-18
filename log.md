@@ -90,7 +90,7 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-scratch-resnet18`
 - PR created: 2026-07-17 23:46:17 AEST
-- PR merged: pending
+- PR merged: 2026-07-17 23:49:26 AEST
 - Summary: add the D-owned factory for a randomly initialized ResNet18 using the shared 500-class setting; no pretrained weights, trainer, checkpoint, or transfer-learning behavior are included.
 - Validation: `git diff --check`, Python syntax compilation, and `python scripts/smoke_test.py` passed. Local model construction was not run because PyTorch is not installed in this environment.
 
@@ -99,9 +99,18 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-scratch-trainer`
 - PR created: 2026-07-18 22:18:55 AEST
-- PR merged: pending
+- PR merged: 2026-07-18 22:21:32 AEST
 - Summary: add minimal scratch-CNN training and validation epochs with cross-entropy, device handling, loss and Top-1 metrics, per-epoch history, and training-curve plotting.
 - Validation: `git diff --check`, Python syntax compilation, two synthetic CPU train/validation epochs with 500-class labels and curve creation, and `python scripts/smoke_test.py` passed.
+
+## PR #16 - Add scratch checkpoint support
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-checkpoint`
+- PR created: 2026-07-18 22:52:57 AEST
+- PR merged: pending
+- Summary: add best-validation-Top-1 checkpoints and a resume helper that restores model, optimizer, history, and the next epoch.
+- Validation: `git diff --check`, Python syntax compilation, a synthetic CPU checkpoint round trip including model and SGD momentum restoration followed by one resumed epoch, and `python scripts/smoke_test.py` passed.
 
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 
