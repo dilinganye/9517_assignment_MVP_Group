@@ -108,6 +108,6 @@ When this file is updated, use this format:
 - Author: Chaohao Liu
 - Branch: `Chaohao_TraditionalFeature2`
 - PR created: 2026-07-18 16:40 AEST
-- PR merged: pending
+- PR merged: 2026-07-18 16:45 AEST
 - Summary: Added `color.ipynb` for colour histogram feature extraction. The notebook loads sample images, resizes them to 224 × 224, calculates a normalised 32-bin histogram for each RGB channel, and combines the three histograms into one feature vector. It also includes a histogram visualisation and a reusable function for later feature extraction.
 - Validation: The notebook ran successfully on images from different classes. Each image produced a `float32` feature vector with shape `(96,)`. The histogram for each RGB channel was normalised to sum to `1.0`, and all tested images produced the same feature length.
