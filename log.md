@@ -112,11 +112,21 @@ When this file is updated, use this format:
 - Summary: Added `color.ipynb` for colour histogram feature extraction. The notebook loads sample images, resizes them to 224 × 224, calculates a normalised 32-bin histogram for each RGB channel, and combines the three histograms into one feature vector. It also includes a histogram visualisation and a reusable function for later feature extraction.
 - Validation: The notebook ran successfully on images from different classes. Each image produced a `float32` feature vector with shape `(96,)`. The histogram for each RGB channel was normalised to sum to `1.0`, and all tested images produced the same feature length.
 
-## PR #13 - Combined HOG and Colour Feature Extraction
+## PR #14 - Combined HOG and Colour Feature Extraction
 
 - Author: Chaohao Liu
 - Branch: `Chaohao_TraditionalFeature3`
 - PR created: 2026-07-18 21:34 AEST
-- PR merged: pending
+- PR merged: 2026-07-18 21:38 AEST
 - Summary: Added `combine.ipynb` to combine the HOG feature and RGB colour histogram into one fixed-length feature vector. The notebook extracts 6084 HOG values and 96 colour histogram values, then concatenates them into a single reusable feature vector using `extract_combined_feature(image)`. It also checks the feature order, output shape, data type, and validity.
 - Validation: The notebook ran successfully on images from different classes. Each image produced a `float32` feature vector with shape `(6180,)`. The HOG and colour sections matched the original feature vectors, all tested images produced the same feature length, and no missing or infinite values were found.There is no error.
+
+
+## PR #17 - Full Dataset Feature Extraction
+
+- Author: Chaohao Liu
+- Branch: `Chaohao_TraditionalFeature5`
+- PR created: 2026-07-20 20:35 AEST
+- PR merged: pending
+- Summary: Added `features.ipynb` to apply the combined HOG and RGB colour feature extractor to the complete training, validation, and test datasets. The notebook loads each image, extracts 6084 HOG values and 96 colour histogram values, combines them into one `float32` feature vector with shape `(6180,)`, and stores the corresponding labels and image paths. The extracted results are saved as compressed `.npz` files in `outputs/traditional_features/`.
+- Validation: The notebook first tested the feature extractor on a small group of images before processing the complete dataset. Every image produced a feature vector with shape `(6180,)` and data type `float32`. The numbers of features, labels, and image paths matched for all dataset splits. No missing or infinite values were found, and the saved `.npz` files were loaded successfully with the same data. There is no error.
