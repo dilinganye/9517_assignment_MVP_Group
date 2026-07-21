@@ -109,6 +109,46 @@ Committed data manifests live in `data/processed/`.
 `-- requirements.txt
 ```
 
+## Project Progress and Advanced Direction
+
+### Current Status
+
+- The shared 500-class manifests, Dataset/DataLoader entry points, manifest checks, and lightweight CI are in place.
+- Traditional HOG and colour-histogram feature extraction notebooks are available; their classifier baseline is still a separate follow-up task.
+- The scratch-CNN path now includes a randomly initialized ResNet18 factory, epoch-level trainer, loss and Top-1 history, curve plotting, and best-validation checkpoint/resume support.
+- The pretrained-CNN path has a ResNet18 training and ablation notebook with a small end-to-end validation run. Full 500-class results and final evaluation remain outstanding.
+
+### Instructor-Supported Continual Learning Direction
+
+Based on course discussion in July 2026, a small class-incremental continual-learning experiment is a reasonable advanced direction. It is not implemented yet and does not replace the required baseline methods.
+
+- Select a fixed 100-class subset from the shared 500 classes and record the selected class IDs.
+- Split it into 10 sequential tasks with 10 classes per task.
+- Use ResNet18 and compare sequential training without replay against a small class-balanced replay memory of 2-5 images per previously seen class.
+- After each task, report current-task accuracy, old-class accuracy, seen-class accuracy, and average forgetting.
+- Where compute permits, compare scratch and ImageNet-pretrained ResNet18; joint training on the same 100 classes is an optional upper bound.
+
+ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The continual-learning work should start only after the required baselines have stable, comparable results.
+
+### 当前进度
+
+- 已具备共享的 500 类数据清单、Dataset/DataLoader 入口、manifest 检查和轻量 CI。
+- 传统 HOG 与颜色直方图特征提取 Notebook 已具备；传统分类器 baseline 仍是后续独立任务。
+- Scratch CNN 已具备随机初始化 ResNet18、按 epoch 的 trainer、loss 和 Top-1 history、曲线绘图，以及按最佳验证集结果保存与恢复 checkpoint 的能力。
+- Pretrained CNN 已具备 ResNet18 训练和消融 Notebook，并完成小规模端到端流程验证；完整 500 类结果和最终评估仍未完成。
+
+### 教师认可的持续学习方向
+
+根据 2026 年 7 月的课程沟通，小规模 class-incremental continual learning 是合理的 advanced direction。该方向尚未实现，也不替代必做 baseline。
+
+- 从共享的 500 类中固定选取 100 类，并记录选中的 class ID。
+- 划分为 10 个顺序任务，每个任务包含 10 类。
+- 使用 ResNet18，对比无 replay 的顺序训练与 class-balanced replay；每个已见类别保留 2-5 张图片。
+- 每完成一个任务后，报告当前任务准确率、旧类准确率、已见类准确率和平均遗忘量。
+- 算力允许时，对比 scratch 与 ImageNet-pretrained ResNet18；同一 100 类上的 joint training 仅作为可选 upper bound。
+
+ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。持续学习工作应在必做 baseline 得到稳定且可比较的结果后再开始。
+
 ## Collaboration Rules
 
 - Keep each PR focused on one small change.
