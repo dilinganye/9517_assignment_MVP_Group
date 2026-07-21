@@ -108,9 +108,18 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-scratch-checkpoint`
 - PR created: 2026-07-18 22:52:57 AEST
-- PR merged: pending
+- PR merged: 2026-07-18 22:58:16 AEST
 - Summary: add best-validation-Top-1 checkpoints and a resume helper that restores model, optimizer, history, and the next epoch.
 - Validation: `git diff --check`, Python syntax compilation, a synthetic CPU checkpoint round trip including model and SGD momentum restoration followed by one resumed epoch, and `python scripts/smoke_test.py` passed.
+
+## PR #<pending> - Add CUDA scratch training entry point
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-training-entry`
+- PR created: pending
+- PR merged: pending
+- Summary: add a CUDA-only entry point that connects the shared manifests, scratch ResNet18, trainer, best-checkpoint resume, and local run artifacts.
+- Validation: pending PR creation.
 
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 

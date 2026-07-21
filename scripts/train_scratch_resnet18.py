@@ -1,0 +1,191 @@
+"""Run the CUDA scratch-ResNet18 baseline on the shared manifests."""
+
+import argparse
+import csv
+import json
+import random
+import subprocess
+import sys
+from pathlib import Path
+
+import numpy as np
+import torch
+from torch import optim
+from torchvision import transforms
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from src import config
+from src.data import create_dataloader, create_dataset
+from src.deep_learning import (
+    create_scratch_resnet18,
+    fit_scratch_model,
+    load_checkpoint,
+    plot_training_curves,
+)
+
+
+def parse_args():
+    """Parse the small set of reproducible scratch-baseline settings."""
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--image-root", type=Path, default=config.DATA_RAW_ROOT)
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=config.OUTPUT_ROOT / "scratch_resnet18",
+    )
+    parser.add_argument("--epochs", type=int, default=20)
+    parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--learning-rate", type=float, default=0.01)
+    parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument("--resume", action="store_true")
+    return parser.parse_args()
+
+
+def set_seed(seed: int):
+    """Seed the CUDA training run as consistently as practical."""
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+
+def create_transform():
+    """Create the shared deterministic image transform for the scratch baseline."""
+
+    return transforms.Compose(
+        [
+            transforms.Resize(config.IMG_SIZE),
+            transforms.ToTensor(),
+            transforms.Normalize(config.IMG_MEAN, config.IMG_STD),
+        ]
+    )
+
+
+def save_history(history, path: Path):
+    """Write the epoch history in a simple table for later analysis."""
+
+    fieldnames = ["epoch", "train_loss", "train_top1", "val_loss", "val_top1"]
+    with path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        for epoch, values in enumerate(
+            zip(
+                history["train_loss"],
+                history["train_top1"],
+                history["val_loss"],
+                history["val_top1"],
+            ),
+            start=1,
+        ):
+            writer.writerow(dict(zip(fieldnames, (epoch, *values))))
+
+
+def get_git_commit():
+    """Return the current commit when the script is run from a Git checkout."""
+
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=config.PROJECT_ROOT,
+            text=True,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
+
+
+def main():
+    """Train or resume the CUDA scratch baseline and save local artifacts."""
+
+    args = parse_args()
+    if args.epochs < 1:
+        raise ValueError("epochs must be at least 1")
+    if not torch.cuda.is_available():
+        raise RuntimeError("CUDA is required for the scratch baseline entry point")
+
+    device = torch.device("cuda")
+    set_seed(config.RANDOM_SEED)
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+
+    transform = create_transform()
+    train_dataset = create_dataset("train", image_root=args.image_root, transform=transform)
+    val_dataset = create_dataset("val", image_root=args.image_root, transform=transform)
+    train_loader = create_dataloader(
+        train_dataset,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=args.num_workers,
+        pin_memory=True,
+    )
+    val_loader = create_dataloader(
+        val_dataset,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        pin_memory=True,
+    )
+
+    model = create_scratch_resnet18()
+    optimizer = optim.SGD(
+        model.parameters(),
+        lr=args.learning_rate,
+        momentum=0.9,
+        weight_decay=1e-4,
+    )
+    checkpoint_path = args.output_dir / "best_checkpoint.pt"
+    start_epoch = 0
+    history = None
+    best_val_top1 = None
+
+    if args.resume:
+        if not checkpoint_path.exists():
+            raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
+        resume_state = load_checkpoint(checkpoint_path, model, optimizer, device)
+        start_epoch = resume_state["next_epoch"]
+        history = resume_state["history"]
+        best_val_top1 = resume_state["best_val_top1"]
+
+    run_config = {
+        "batch_size": args.batch_size,
+        "device": str(device),
+        "epochs_this_run": args.epochs,
+        "git_commit": get_git_commit(),
+        "image_root": str(args.image_root),
+        "image_size": config.IMG_SIZE,
+        "learning_rate": args.learning_rate,
+        "num_classes": config.NUM_CLASSES,
+        "num_workers": args.num_workers,
+        "random_seed": config.RANDOM_SEED,
+        "resume": args.resume,
+        "start_epoch": start_epoch,
+    }
+    with (args.output_dir / "run_config.json").open("w", encoding="utf-8") as file:
+        json.dump(run_config, file, indent=2)
+
+    history = fit_scratch_model(
+        model,
+        train_loader,
+        val_loader,
+        optimizer,
+        device,
+        args.epochs,
+        checkpoint_path=checkpoint_path,
+        start_epoch=start_epoch,
+        history=history,
+        best_val_top1=best_val_top1,
+    )
+    save_history(history, args.output_dir / "history.csv")
+    figure = plot_training_curves(history)
+    figure.savefig(args.output_dir / "training_curves.png", dpi=150)
+
+    best_epoch = max(range(len(history["val_top1"])), key=history["val_top1"].__getitem__) + 1
+    print(f"Best validation Top-1: {history['val_top1'][best_epoch - 1]:.4f} at epoch {best_epoch}")
+    print(f"Outputs saved to: {args.output_dir}")
+
+
+if __name__ == "__main__":
+    main()
