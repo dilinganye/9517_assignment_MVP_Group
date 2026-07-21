@@ -112,14 +112,14 @@ When this file is updated, use this format:
 - Summary: add best-validation-Top-1 checkpoints and a resume helper that restores model, optimizer, history, and the next epoch.
 - Validation: `git diff --check`, Python syntax compilation, a synthetic CPU checkpoint round trip including model and SGD momentum restoration followed by one resumed epoch, and `python scripts/smoke_test.py` passed.
 
-## PR #<pending> - Add CUDA scratch training entry point
+## PR #20 - Add CUDA scratch training entry point
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-scratch-training-entry`
-- PR created: pending
-- PR merged: pending
+- PR created: 2026-07-21 22:49:02 AEST
+- PR merged: 2026-07-21 23:20:53 AEST
 - Summary: add a CUDA-only entry point that connects the shared manifests, scratch ResNet18, trainer, best-checkpoint resume, and local run artifacts.
-- Validation: pending PR creation.
+- Validation: `git diff --check`, Python syntax compilation, direct `--help` invocation, a history CSV and transform helper smoke test, a CUDA-unavailable guard check, and `python scripts/smoke_test.py` passed. Full training requires NVIDIA CUDA and local raw images, which are unavailable in this environment.
 
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 
