@@ -106,6 +106,38 @@ Each `.npz` file contains:
 
 The notebook checks that all feature vectors have length `6180`, use the `float32` data type, contain no missing or infinite values, and match the number of labels and image paths.
 
+### `cache.ipynb`
+
+Branch: `Chaohao_TraditionalFeature5`
+
+This notebook loads the combined HOG and RGB colour feature files created by `features.ipynb`.
+
+The feature files are loaded from:
+
+```text
+outputs/traditional_features/
+```
+
+Because the `outputs` folder is ignored by Git, the generated `.npz` files are shared separately through OneDrive.
+
+After downloading, the following files should be placed in `outputs/traditional_features/`:
+
+- `train_combined_features.npz`
+- `validation_combined_features.npz`
+- `test_combined_features.npz`
+
+The notebook loads and prepares:
+
+```text
+X_train, y_train, train_paths
+X_val, y_val, val_paths
+X_test, y_test, test_paths
+```
+
+These variables match the inputs expected by `traditional_classifier.ipynb`.
+
+The notebook also displays the dataset split sizes and a sample cached feature vector. It does not repeat the complete feature validation already performed in `features.ipynb`.
+
 ## Shared Configuration
 
 All notebooks use the shared project configuration:
