@@ -130,6 +130,15 @@ When this file is updated, use this format:
 - Summary: add an opt-in training-only augmentation flag for controlled scratch ResNet18 comparison against the completed no-augmentation baseline.
 - Validation: `git diff --check`, Python syntax compilation, direct `--help` invocation, helper checks for the deterministic and augmented transforms plus history CSV output, a CUDA-unavailable guard check, and `python scripts/smoke_test.py` passed. Full CUDA training remains for Colab.
 
+## PR #26 - Add unified final evaluation
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-unified-final-evaluation`
+- PR created: 2026-07-23 00:02:25 AEST
+- PR merged: pending
+- Summary: add shared classification metrics and a CUDA scratch-ResNet18 test entry that writes a common local evaluation artifact format.
+- Validation: `git diff --check`, CI-equivalent Python syntax compilation, synthetic 500-class shared-metric checks, prediction CSV and confusion-plot artifact checks, checkpoint compatibility, missing-checkpoint and CUDA-unavailable guards, and `python scripts/smoke_test.py` passed. Full CUDA test evaluation remains for Colab.
+
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 
 - Author: Chaohao Liu
