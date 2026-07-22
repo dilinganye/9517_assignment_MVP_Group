@@ -50,6 +50,30 @@ The same lightweight checks run in GitHub Actions for pull requests and pushes t
 
 同一组轻量检查也会在 GitHub Actions 中对 PR 和推送到 `main` 的提交自动运行。
 
+## Final Evaluation
+
+Select a model using validation results, then run the held-out test set once. For the
+scratch ResNet18 candidate trained with augmentation on Colab:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/evaluate_scratch_resnet18.py \
+  --checkpoint /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/augmentation_v1/best_checkpoint.pt \
+  --image-root /content/inat_data \
+  --output-dir /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation
+```
+
+The command writes `metrics.json`, `evaluation_config.json`, per-image
+`predictions.csv`, and the full confusion matrix as CSV and PNG. The shared
+`src.evaluation.evaluate_class_scores` helper defines the common Top-1, Top-5,
+overall accuracy, macro precision, macro recall, and macro F1 fields for every
+method.
+
+先根据验证集选择模型，再只在保留的 test 集上运行一次最终评估。上面的 Colab
+命令使用带增强的 scratch ResNet18 候选模型。它会写入 `metrics.json`、
+`evaluation_config.json`、逐图片的 `predictions.csv`，以及 CSV 和 PNG 格式的完整
+混淆矩阵。共享的 `src.evaluation.evaluate_class_scores` 规定所有方法使用相同的
+Top-1、Top-5、overall accuracy、macro precision、macro recall 和 macro F1 字段。
+
 ## Data Processing Notes
 
 数据处理提示：
