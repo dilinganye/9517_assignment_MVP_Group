@@ -58,4 +58,4 @@ misclassified test images, and the fitted models) are saved under
 
 Current branch:
 
-`Hengyi_TraditionalClassifier1`
+`Hengyi_TraditionalClassifier2`
