@@ -154,6 +154,15 @@ When this file is updated, use this format:
 - Author: Chaohao Liu
 - Branch: `Chaohao_TraditionalFeature5`
 - PR created: 2026-07-20 20:35 AEST
-- PR merged: pending
+- PR merged: 2026-07-20 21:09 AEST
 - Summary: Added `features.ipynb` to apply the combined HOG and RGB colour feature extractor to the complete training, validation, and test datasets. The notebook loads each image, extracts 6084 HOG values and 96 colour histogram values, combines them into one `float32` feature vector with shape `(6180,)`, and stores the corresponding labels and image paths. The extracted results are saved as compressed `.npz` files in `outputs/traditional_features/`.
 - Validation: The notebook first tested the feature extractor on a small group of images before processing the complete dataset. Every image produced a feature vector with shape `(6180,)` and data type `float32`. The numbers of features, labels, and image paths matched for all dataset splits. No missing or infinite values were found, and the saved `.npz` files were loaded successfully with the same data. There is no error.
+
+## PR #24 - Full Dataset Feature Extraction and Cache Loading
+
+- Author: Chaohao Liu
+- Branch: `Chaohao_TraditionalFeature5`
+- PR created: pending
+- PR merged: pending
+- Summary: Added `features.ipynb` to apply the combined HOG and RGB colour feature extractor to the complete training, validation, and test datasets. Each image is converted into a `float32` feature vector with shape `(6180,)`, containing 6084 HOG values and 96 RGB colour histogram values. The extracted features, labels, and image paths are saved as compressed `.npz` files in `outputs/traditional_features/`. Added `cache.ipynb` to load these feature files and prepare `X_train`, `X_val`, and `X_test` with their corresponding labels and image paths for `traditional_classifier.ipynb`. The notebook also includes simple visualisations of the dataset split sizes and a sample cached feature vector.
+- Validation: `features.ipynb` successfully produced fixed-length feature matrices for the training, validation, and test datasets. All feature matrices used the `float32` data type, contained no missing or infinite values, and matched the numbers of labels and image paths. The saved `.npz` files were loaded successfully by `cache.ipynb`, and the returned variable names and shapes matched the inputs expected by `traditional_classifier.ipynb`. There is no error.
