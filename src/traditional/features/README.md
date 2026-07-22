@@ -205,6 +205,18 @@ outputs/traditional_features/
 
 These files can be used directly for traditional classifier training.
 
+## Downloading Cached Features
+
+The generated traditional feature files are shared through OneDrive:
+
+[Download traditional feature files](https://unsw-my.sharepoint.com/:f:/g/personal/z5528581_ad_unsw_edu_au/IgAsAxZV1fJQSbL1AAmSgGoaAU-ZRhVTJmVLsHFxH7leipA?e=beAfW7)
+
+After downloading, place the files in:
+
+```text
+outputs/traditional_features/
+```
+
 ## Maintenance
 
 When adding a new feature:
