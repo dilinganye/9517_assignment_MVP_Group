@@ -154,6 +154,6 @@ When this file is updated, use this format:
 - Author: Chaohao Liu
 - Branch: `Chaohao_TraditionalFeature5`
 - PR created: 2026-07-20 20:35 AEST
-- PR merged: pending
+- PR merged: 2026-07-20 21:09 AEST
 - Summary: Added `features.ipynb` to apply the combined HOG and RGB colour feature extractor to the complete training, validation, and test datasets. The notebook loads each image, extracts 6084 HOG values and 96 colour histogram values, combines them into one `float32` feature vector with shape `(6180,)`, and stores the corresponding labels and image paths. The extracted results are saved as compressed `.npz` files in `outputs/traditional_features/`.
 - Validation: The notebook first tested the feature extractor on a small group of images before processing the complete dataset. Every image produced a feature vector with shape `(6180,)` and data type `float32`. The numbers of features, labels, and image paths matched for all dataset splits. No missing or infinite values were found, and the saved `.npz` files were loaded successfully with the same data. There is no error.
