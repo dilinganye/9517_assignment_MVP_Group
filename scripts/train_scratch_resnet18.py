@@ -41,6 +41,7 @@ def parse_args():
     parser.add_argument("--learning-rate", type=float, default=0.01)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--train-augmentation", action="store_true")
     return parser.parse_args()
 
 
@@ -55,8 +56,18 @@ def set_seed(seed: int):
     torch.backends.cudnn.benchmark = False
 
 
-def create_transform():
-    """Create the shared deterministic image transform for the scratch baseline."""
+def create_transform(train_augmentation: bool = False):
+    """Create the training or deterministic evaluation transform."""
+
+    if train_augmentation:
+        return transforms.Compose(
+            [
+                transforms.RandomResizedCrop(config.IMG_SIZE, scale=(0.75, 1.0)),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(config.IMG_MEAN, config.IMG_STD),
+            ]
+        )
 
     return transforms.Compose(
         [
@@ -112,9 +123,14 @@ def main():
     set_seed(config.RANDOM_SEED)
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    transform = create_transform()
-    train_dataset = create_dataset("train", image_root=args.image_root, transform=transform)
-    val_dataset = create_dataset("val", image_root=args.image_root, transform=transform)
+    train_transform = create_transform(args.train_augmentation)
+    eval_transform = create_transform()
+    train_dataset = create_dataset(
+        "train",
+        image_root=args.image_root,
+        transform=train_transform,
+    )
+    val_dataset = create_dataset("val", image_root=args.image_root, transform=eval_transform)
     train_loader = create_dataloader(
         train_dataset,
         batch_size=args.batch_size,
@@ -162,6 +178,7 @@ def main():
         "random_seed": config.RANDOM_SEED,
         "resume": args.resume,
         "start_epoch": start_epoch,
+        "train_augmentation": args.train_augmentation,
     }
     with (args.output_dir / "run_config.json").open("w", encoding="utf-8") as file:
         json.dump(run_config, file, indent=2)

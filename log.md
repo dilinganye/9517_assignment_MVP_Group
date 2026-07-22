@@ -121,6 +121,15 @@ When this file is updated, use this format:
 - Summary: add a CUDA-only entry point that connects the shared manifests, scratch ResNet18, trainer, best-checkpoint resume, and local run artifacts.
 - Validation: `git diff --check`, Python syntax compilation, direct `--help` invocation, a history CSV and transform helper smoke test, a CUDA-unavailable guard check, and `python scripts/smoke_test.py` passed. Full training requires NVIDIA CUDA and local raw images, which are unavailable in this environment.
 
+## PR #25 - Add scratch training augmentation
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-train-augmentation`
+- PR created: 2026-07-22 22:54:42 AEST
+- PR merged: pending
+- Summary: add an opt-in training-only augmentation flag for controlled scratch ResNet18 comparison against the completed no-augmentation baseline.
+- Validation: `git diff --check`, Python syntax compilation, direct `--help` invocation, helper checks for the deterministic and augmented transforms plus history CSV output, a CUDA-unavailable guard check, and `python scripts/smoke_test.py` passed. Full CUDA training remains for Colab.
+
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 
 - Author: Chaohao Liu
