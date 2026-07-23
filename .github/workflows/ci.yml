@@ -21,7 +21,7 @@ jobs:
 
       - name: Compile lightweight Python modules
         run: |
-          python -m py_compile scripts/smoke_test.py scripts/summarize_data_manifests.py src/config.py
+          python -m py_compile scripts/smoke_test.py scripts/summarize_data_manifests.py scripts/evaluate_scratch_resnet18.py src/config.py src/evaluation.py
 
       - name: Run manifest smoke test
         run: |

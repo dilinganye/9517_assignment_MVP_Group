@@ -121,6 +121,24 @@ When this file is updated, use this format:
 - Summary: add a CUDA-only entry point that connects the shared manifests, scratch ResNet18, trainer, best-checkpoint resume, and local run artifacts.
 - Validation: `git diff --check`, Python syntax compilation, direct `--help` invocation, a history CSV and transform helper smoke test, a CUDA-unavailable guard check, and `python scripts/smoke_test.py` passed. Full training requires NVIDIA CUDA and local raw images, which are unavailable in this environment.
 
+## PR #25 - Add scratch training augmentation
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-train-augmentation`
+- PR created: 2026-07-22 22:54:42 AEST
+- PR merged: pending
+- Summary: add an opt-in training-only augmentation flag for controlled scratch ResNet18 comparison against the completed no-augmentation baseline.
+- Validation: `git diff --check`, Python syntax compilation, direct `--help` invocation, helper checks for the deterministic and augmented transforms plus history CSV output, a CUDA-unavailable guard check, and `python scripts/smoke_test.py` passed. Full CUDA training remains for Colab.
+
+## PR #26 - Add unified final evaluation
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-unified-final-evaluation`
+- PR created: 2026-07-23 00:02:25 AEST
+- PR merged: pending
+- Summary: add shared classification metrics and a CUDA scratch-ResNet18 test entry that writes a common local evaluation artifact format.
+- Validation: `git diff --check`, CI-equivalent Python syntax compilation, synthetic 500-class shared-metric checks, prediction CSV and confusion-plot artifact checks, checkpoint compatibility, missing-checkpoint and CUDA-unavailable guards, and `python scripts/smoke_test.py` passed. Full CUDA test evaluation remains for Colab.
+
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 
 - Author: Chaohao Liu
@@ -154,6 +172,15 @@ When this file is updated, use this format:
 - Author: Chaohao Liu
 - Branch: `Chaohao_TraditionalFeature5`
 - PR created: 2026-07-20 20:35 AEST
-- PR merged: pending
+- PR merged: 2026-07-20 21:09 AEST
 - Summary: Added `features.ipynb` to apply the combined HOG and RGB colour feature extractor to the complete training, validation, and test datasets. The notebook loads each image, extracts 6084 HOG values and 96 colour histogram values, combines them into one `float32` feature vector with shape `(6180,)`, and stores the corresponding labels and image paths. The extracted results are saved as compressed `.npz` files in `outputs/traditional_features/`.
 - Validation: The notebook first tested the feature extractor on a small group of images before processing the complete dataset. Every image produced a feature vector with shape `(6180,)` and data type `float32`. The numbers of features, labels, and image paths matched for all dataset splits. No missing or infinite values were found, and the saved `.npz` files were loaded successfully with the same data. There is no error.
+
+## PR #24 - Full Dataset Feature Extraction and Cache Loading
+
+- Author: Chaohao Liu
+- Branch: `Chaohao_TraditionalFeature5`
+- PR created: pending
+- PR merged: pending
+- Summary: Added `features.ipynb` to apply the combined HOG and RGB colour feature extractor to the complete training, validation, and test datasets. Each image is converted into a `float32` feature vector with shape `(6180,)`, containing 6084 HOG values and 96 RGB colour histogram values. The extracted features, labels, and image paths are saved as compressed `.npz` files in `outputs/traditional_features/`. Added `cache.ipynb` to load these feature files and prepare `X_train`, `X_val`, and `X_test` with their corresponding labels and image paths for `traditional_classifier.ipynb`. The notebook also includes simple visualisations of the dataset split sizes and a sample cached feature vector.
+- Validation: `features.ipynb` successfully produced fixed-length feature matrices for the training, validation, and test datasets. All feature matrices used the `float32` data type, contained no missing or infinite values, and matched the numbers of labels and image paths. The saved `.npz` files were loaded successfully by `cache.ipynb`, and the returned variable names and shapes matched the inputs expected by `traditional_classifier.ipynb`. There is no error.
