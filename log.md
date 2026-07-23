@@ -30,6 +30,15 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #29 - Add scratch timing and evaluation analysis
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-analysis-timing`
+- PR created: 2026-07-23 21:27:16 AEST
+- PR merged: pending
+- Summary: add post-hoc scratch test analysis from saved predictions, record per-epoch and cumulative training time for future scratch runs, document the completed Colab timing observation, and refresh project status and known report guardrails.
+- Validation: `git diff --check`, Python compile-all, manifest smoke test, CPU synthetic trainer timing check, synthetic 500-class prediction-analysis artifacts, and both entry-point `--help` checks passed. No raw images, model weights, or test inference were run.
+
 ## PR #1 - Add project infrastructure skeleton: Fix requirements.txt and Add README.md as placeholder
 
 - Author: xuanzhougu
