@@ -30,6 +30,15 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #30 - Add continual learning task plan
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-cl-task-setup`
+- PR created: 2026-07-23 22:40:43 AEST
+- PR merged: pending
+- Summary: start the D-owned scratch continual-learning direction with a deterministic committed 100-class, 10-task map, plan verification command, minimal CI coverage, and bilingual documentation for class-incremental no-replay versus class-balanced replay experiments.
+- Validation: `git diff --check`, Python compile-all, manifest smoke test, manifest summary generation, deterministic default and alternate-seed task-plan checks, and verification that every task filters to 400 train, 100 validation, and 100 test samples passed. No GPU training, replay, model weights, or test evaluation was run.
+
 ## PR #29 - Add scratch timing and evaluation analysis
 
 - Author: xuanzhougu
