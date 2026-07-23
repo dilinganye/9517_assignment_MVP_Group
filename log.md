@@ -22,6 +22,14 @@ When this file is updated, use this format:
 - Validation: ...
 ```
 
+## Scratch Experiment Record - augmentation_v1
+
+- Owner: xuanzhougu
+- Environment: Google Colab Tesla T4, batch size 64, two DataLoader workers, 20 epochs, training-only augmentation.
+- Training time: approximately 46 minutes of wall-clock time shown by the completed Colab cell. This is a manually observed record because the original run predated automatic epoch timing.
+- Selection: best validation Top-1 was 0.2458 at epoch 19.
+- Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
+
 ## PR #1 - Add project infrastructure skeleton: Fix requirements.txt and Add README.md as placeholder
 
 - Author: xuanzhougu
@@ -126,7 +134,7 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-scratch-train-augmentation`
 - PR created: 2026-07-22 22:54:42 AEST
-- PR merged: pending
+- PR merged: 2026-07-22 22:58:07 AEST
 - Summary: add an opt-in training-only augmentation flag for controlled scratch ResNet18 comparison against the completed no-augmentation baseline.
 - Validation: `git diff --check`, Python syntax compilation, direct `--help` invocation, helper checks for the deterministic and augmented transforms plus history CSV output, a CUDA-unavailable guard check, and `python scripts/smoke_test.py` passed. Full CUDA training remains for Colab.
 
@@ -135,7 +143,7 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-unified-final-evaluation`
 - PR created: 2026-07-23 00:02:25 AEST
-- PR merged: pending
+- PR merged: 2026-07-23 00:06:35 AEST
 - Summary: add shared classification metrics and a CUDA scratch-ResNet18 test entry that writes a common local evaluation artifact format.
 - Validation: `git diff --check`, CI-equivalent Python syntax compilation, synthetic 500-class shared-metric checks, prediction CSV and confusion-plot artifact checks, checkpoint compatibility, missing-checkpoint and CUDA-unavailable guards, and `python scripts/smoke_test.py` passed. Full CUDA test evaluation remains for Colab.
 
@@ -144,7 +152,7 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-last-checkpoint-resume-guard`
 - PR created: 2026-07-23 20:45:46 AEST
-- PR merged: pending
+- PR merged: 2026-07-23 20:48:12 AEST
 - Summary: save separate best and latest scratch checkpoints, and reject resumes with training-defining configuration mismatches.
 - Validation: `git diff --check`, CI-equivalent Python syntax compilation, direct training-entry `--help`, synthetic CPU best/last checkpoint round trips, resume configuration mismatch rejection, legacy-checkpoint evaluation compatibility with resume rejection, and `python scripts/smoke_test.py` passed. Full CUDA training remains for Colab.
 

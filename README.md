@@ -63,16 +63,32 @@ CUDA_VISIBLE_DEVICES=0 python scripts/evaluate_scratch_resnet18.py \
 ```
 
 The command writes `metrics.json`, `evaluation_config.json`, per-image
-`predictions.csv`, and the full confusion matrix as CSV and PNG. The shared
+`predictions.csv`, and the full confusion matrix as CSV and PNG. Analyse the
+saved predictions without rerunning test inference:
+
+```bash
+python scripts/analyze_scratch_evaluation.py \
+  --predictions /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/predictions.csv
+```
+
+This writes per-class precision/recall/F1, the most frequent species-confusion
+pairs, and a readable confusion plot for the lowest-recall classes. The shared
 `src.evaluation.evaluate_class_scores` helper defines the common Top-1, Top-5,
-overall accuracy, macro precision, macro recall, and macro F1 fields for every
-method.
+overall accuracy, macro precision, macro recall, and macro F1 fields.
 
 先根据验证集选择模型，再只在保留的 test 集上运行一次最终评估。上面的 Colab
 命令使用带增强的 scratch ResNet18 候选模型。它会写入 `metrics.json`、
 `evaluation_config.json`、逐图片的 `predictions.csv`，以及 CSV 和 PNG 格式的完整
-混淆矩阵。共享的 `src.evaluation.evaluate_class_scores` 规定所有方法使用相同的
-Top-1、Top-5、overall accuracy、macro precision、macro recall 和 macro F1 字段。
+混淆矩阵。无需再次运行 test 推理，即可分析已保存的预测：
+
+```bash
+python scripts/analyze_scratch_evaluation.py \
+  --predictions /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/predictions.csv
+```
+
+该脚本会写入每类 precision/recall/F1、最常见物种混淆对，以及针对 recall 最低类别的可读混淆图。共享的
+`src.evaluation.evaluate_class_scores` 规定 Top-1、Top-5、overall accuracy、macro
+precision、macro recall 和 macro F1 字段。
 
 ## Data Processing Notes
 
@@ -138,9 +154,15 @@ Committed data manifests live in `data/processed/`.
 ### Current Status
 
 - The shared 500-class manifests, Dataset/DataLoader entry points, manifest checks, and lightweight CI are in place.
-- Traditional HOG and colour-histogram feature extraction notebooks are available; their classifier baseline is still a separate follow-up task.
-- The scratch-CNN path now includes a randomly initialized ResNet18 factory, epoch-level trainer, loss and Top-1 history, curve plotting, and best-validation checkpoint/resume support.
+- Traditional HOG and colour-histogram features, plus Linear SVM and Random Forest classifier baselines, are available. The final report must document SVM selection from validation results only; the current notebook commentary should not use test-set comparisons to justify a hyperparameter choice.
+- The scratch-CNN path now includes a randomly initialized ResNet18 factory, epoch-level trainer, loss and Top-1 history, training-time recording, curve plotting, best/last checkpoints with resume guards, and final test evaluation. The completed augmentation run reached validation Top-1 0.2458 at epoch 19 and held-out test Top-1 0.2440. Its Colab Tesla T4 cell showed approximately 46 minutes of wall-clock time; this is a manually observed historical record, while future runs write per-epoch and total timing automatically.
 - The pretrained-CNN path has a ResNet18 training and ablation notebook with a small end-to-end validation run. Full 500-class results and final evaluation remain outstanding.
+
+### Known Gaps and Report Guardrails
+
+- The pretrained 500-class baseline, its held-out test evaluation, and Grad-CAM remain incomplete; continual learning must wait for this required baseline.
+- `src.evaluation.evaluate_class_scores` is used by scratch evaluation. Traditional and pretrained routes must emit the same metric fields and comparable final artifacts before the final result table is assembled.
+- The lightweight CI checks syntax and manifests only. A separate dependency-installed synthetic deep-learning/evaluation smoke job remains a follow-up, not a full training job.
 
 ### Instructor-Supported Continual Learning Direction
 
@@ -157,9 +179,15 @@ ImageNet-retention evaluation, complex replay selection, and 500-class continual
 ### 当前进度
 
 - 已具备共享的 500 类数据清单、Dataset/DataLoader 入口、manifest 检查和轻量 CI。
-- 传统 HOG 与颜色直方图特征提取 Notebook 已具备；传统分类器 baseline 仍是后续独立任务。
-- Scratch CNN 已具备随机初始化 ResNet18、按 epoch 的 trainer、loss 和 Top-1 history、曲线绘图，以及按最佳验证集结果保存与恢复 checkpoint 的能力。
+- 传统 HOG 与颜色直方图特征、Linear SVM 和 Random Forest 分类 baseline 已具备。最终报告必须只用验证集说明 SVM 选择；当前 notebook 的说明不应再以 test 集比较来支撑超参数取舍。
+- Scratch CNN 已具备随机初始化 ResNet18、按 epoch 的 trainer、loss 和 Top-1 history、训练耗时记录、曲线绘图、best/last checkpoint 与 resume guard，以及最终 test 评估。已完成的 augmentation run 在第 19 个 epoch 达到 validation Top-1 0.2458，并取得 held-out test Top-1 0.2440。Colab Tesla T4 cell 显示约 46 分钟 wall-clock time；这是手动观察到的历史记录，后续运行会自动保存每个 epoch 和总训练耗时。
 - Pretrained CNN 已具备 ResNet18 训练和消融 Notebook，并完成小规模端到端流程验证；完整 500 类结果和最终评估仍未完成。
+
+### 已知缺口与报告约束
+
+- pretrained 500 类 baseline、其 held-out test 评估和 Grad-CAM 尚未完成；在此之前不应启动持续学习主体实验。
+- `src.evaluation.evaluate_class_scores` 目前由 scratch 评估使用。传统和 pretrained 路线在最终结果表汇总前，必须输出相同指标字段和可比较的最终产物。
+- 轻量 CI 只检查语法和 manifest。一项安装依赖的合成 deep-learning/evaluation smoke job 仍是后续工作，但不应在 CI 中加入完整训练。
 
 ### 教师认可的持续学习方向
 

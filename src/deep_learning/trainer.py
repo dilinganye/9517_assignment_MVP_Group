@@ -1,5 +1,7 @@
 """Minimal training utilities for the scratch CNN baseline."""
 
+import time
+
 import matplotlib.pyplot as plt
 import torch
 from torch import nn
@@ -91,7 +93,14 @@ def fit_scratch_model(
     device = torch.device(device)
     criterion = criterion or nn.CrossEntropyLoss()
     model.to(device)
-    history = history or {"train_loss": [], "train_top1": [], "val_loss": [], "val_top1": []}
+    history = history or {
+        "train_loss": [],
+        "train_top1": [],
+        "val_loss": [],
+        "val_top1": [],
+        "epoch_seconds": [],
+    }
+    history.setdefault("epoch_seconds", [None] * len(history["train_loss"]))
     best_val_top1 = (
         max(history["val_top1"], default=float("-inf"))
         if best_val_top1 is None
@@ -99,12 +108,14 @@ def fit_scratch_model(
     )
 
     for epoch in range(start_epoch, start_epoch + epochs):
+        epoch_start = time.perf_counter()
         train_metrics = train_one_epoch(model, train_loader, optimizer, device, criterion)
         val_metrics = validate_one_epoch(model, val_loader, device, criterion)
         history["train_loss"].append(train_metrics["loss"])
         history["train_top1"].append(train_metrics["top1"])
         history["val_loss"].append(val_metrics["loss"])
         history["val_top1"].append(val_metrics["top1"])
+        history["epoch_seconds"].append(time.perf_counter() - epoch_start)
 
         if best_checkpoint_path and val_metrics["top1"] > best_val_top1:
             best_val_top1 = val_metrics["top1"]

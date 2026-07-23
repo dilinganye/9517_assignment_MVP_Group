@@ -81,7 +81,7 @@ def create_transform(train_augmentation: bool = False):
 def save_history(history, path: Path):
     """Write the epoch history in a simple table for later analysis."""
 
-    fieldnames = ["epoch", "train_loss", "train_top1", "val_loss", "val_top1"]
+    fieldnames = ["epoch", "train_loss", "train_top1", "val_loss", "val_top1", "epoch_seconds"]
     with path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
@@ -91,6 +91,7 @@ def save_history(history, path: Path):
                 history["train_top1"],
                 history["val_loss"],
                 history["val_top1"],
+                history.get("epoch_seconds", [None] * len(history["train_loss"])),
             ),
             start=1,
         ):
@@ -195,9 +196,6 @@ def main():
         best_val_top1 = resume_state["best_val_top1"]
         run_config["start_epoch"] = start_epoch
 
-    with (args.output_dir / "run_config.json").open("w", encoding="utf-8") as file:
-        json.dump(run_config, file, indent=2)
-
     history = fit_scratch_model(
         model,
         train_loader,
@@ -212,6 +210,17 @@ def main():
         history=history,
         best_val_top1=best_val_top1,
     )
+    completed_epoch_seconds = [
+        seconds for seconds in history.get("epoch_seconds", []) if seconds is not None
+    ]
+    current_run_seconds = [
+        seconds for seconds in history.get("epoch_seconds", [])[start_epoch:] if seconds is not None
+    ]
+    run_config["epochs_completed"] = len(history["train_loss"])
+    run_config["training_seconds_this_run"] = sum(current_run_seconds)
+    run_config["training_seconds_total"] = sum(completed_epoch_seconds)
+    with (args.output_dir / "run_config.json").open("w", encoding="utf-8") as file:
+        json.dump(run_config, file, indent=2)
     save_history(history, args.output_dir / "history.csv")
     figure = plot_training_curves(history)
     figure.savefig(args.output_dir / "training_curves.png", dpi=150)
