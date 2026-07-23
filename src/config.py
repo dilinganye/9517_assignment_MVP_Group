@@ -42,6 +42,8 @@ CLASS_LIST_CSV = DATA_SPLITS_DIR / "class_list_500.csv"
 TRAIN_CSV = DATA_SPLITS_DIR / "train.csv"
 VAL_CSV = DATA_SPLITS_DIR / "val.csv"
 TEST_CSV = DATA_SPLITS_DIR / "test.csv"
+CONTINUAL_PLAN_DIR = DATA_PROCESSED_ROOT / "continual_100"
+CONTINUAL_CLASS_TASKS_CSV = CONTINUAL_PLAN_DIR / "class_tasks_100.csv"
 
 # OUTPUT_ROOT 输出目录（本地生成，Git忽略）
 OUTPUT_ROOT = PROJECT_ROOT / "outputs"
@@ -54,6 +56,8 @@ OUTPUT_ROOT = PROJECT_ROOT / "outputs"
 # ============= 数据集全局参数（所有人必须共用，禁止私自修改） =====
 RANDOM_SEED = 56  # Just a global seed 全局随机种子，所有随机操作必须用这个
 NUM_CLASSES = 500  # Number of experiment categories 实验类别数
+CONTINUAL_NUM_CLASSES = 100  # Fixed subset size for the CL advanced experiment
+CONTINUAL_CLASSES_PER_TASK = 10  # Ten sequential class-incremental tasks
 IMG_SIZE = (224, 224)  # global image input size统一输入图像尺寸
 
 # 每类样本数划分
