@@ -70,16 +70,23 @@ def fit_scratch_model(
     epochs: int,
     criterion=None,
     checkpoint_path=None,
+    best_checkpoint_path=None,
+    last_checkpoint_path=None,
+    run_config=None,
     start_epoch: int = 0,
     history=None,
     best_val_top1=None,
 ):
-    """Train and validate a scratch model, optionally saving the best checkpoint."""
+    """Train, validate, and save best and latest checkpoints when configured."""
 
     if epochs < 1:
         raise ValueError("epochs must be at least 1")
     if start_epoch < 0:
         raise ValueError("start_epoch must be non-negative")
+    if checkpoint_path is not None and best_checkpoint_path is not None:
+        raise ValueError("Use checkpoint_path or best_checkpoint_path, not both")
+
+    best_checkpoint_path = best_checkpoint_path or checkpoint_path
 
     device = torch.device(device)
     criterion = criterion or nn.CrossEntropyLoss()
@@ -99,15 +106,28 @@ def fit_scratch_model(
         history["val_loss"].append(val_metrics["loss"])
         history["val_top1"].append(val_metrics["top1"])
 
-        if checkpoint_path and val_metrics["top1"] > best_val_top1:
+        if best_checkpoint_path and val_metrics["top1"] > best_val_top1:
             best_val_top1 = val_metrics["top1"]
             save_checkpoint(
-                checkpoint_path,
+                best_checkpoint_path,
                 epoch,
                 model,
                 optimizer,
                 history,
                 best_val_top1,
+                run_config=run_config,
+                checkpoint_type="best",
+            )
+        if last_checkpoint_path:
+            save_checkpoint(
+                last_checkpoint_path,
+                epoch,
+                model,
+                optimizer,
+                history,
+                best_val_top1,
+                run_config=run_config,
+                checkpoint_type="last",
             )
 
     return history
