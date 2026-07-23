@@ -139,6 +139,15 @@ When this file is updated, use this format:
 - Summary: add shared classification metrics and a CUDA scratch-ResNet18 test entry that writes a common local evaluation artifact format.
 - Validation: `git diff --check`, CI-equivalent Python syntax compilation, synthetic 500-class shared-metric checks, prediction CSV and confusion-plot artifact checks, checkpoint compatibility, missing-checkpoint and CUDA-unavailable guards, and `python scripts/smoke_test.py` passed. Full CUDA test evaluation remains for Colab.
 
+## PR #28 - Add safe scratch resume checkpoints
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-last-checkpoint-resume-guard`
+- PR created: 2026-07-23 20:45:46 AEST
+- PR merged: pending
+- Summary: save separate best and latest scratch checkpoints, and reject resumes with training-defining configuration mismatches.
+- Validation: `git diff --check`, CI-equivalent Python syntax compilation, direct training-entry `--help`, synthetic CPU best/last checkpoint round trips, resume configuration mismatch rejection, legacy-checkpoint evaluation compatibility with resume rejection, and `python scripts/smoke_test.py` passed. Full CUDA training remains for Colab.
+
 ## PR #11 - Extraction of HOG (Histogram of Oriented Gradients)
 
 - Author: Chaohao Liu

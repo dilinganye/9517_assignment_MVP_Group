@@ -152,34 +152,49 @@ def main():
         momentum=0.9,
         weight_decay=1e-4,
     )
-    checkpoint_path = args.output_dir / "best_checkpoint.pt"
+    best_checkpoint_path = args.output_dir / "best_checkpoint.pt"
+    last_checkpoint_path = args.output_dir / "last_checkpoint.pt"
     start_epoch = 0
     history = None
     best_val_top1 = None
-
-    if args.resume:
-        if not checkpoint_path.exists():
-            raise FileNotFoundError(f"Checkpoint not found: {checkpoint_path}")
-        resume_state = load_checkpoint(checkpoint_path, model, optimizer, device)
-        start_epoch = resume_state["next_epoch"]
-        history = resume_state["history"]
-        best_val_top1 = resume_state["best_val_top1"]
 
     run_config = {
         "batch_size": args.batch_size,
         "device": str(device),
         "epochs_this_run": args.epochs,
         "git_commit": get_git_commit(),
+        "image_mean": config.IMG_MEAN,
         "image_root": str(args.image_root),
-        "image_size": config.IMG_SIZE,
+        "image_size": list(config.IMG_SIZE),
+        "image_std": config.IMG_STD,
         "learning_rate": args.learning_rate,
+        "model_name": "scratch_resnet18",
+        "momentum": 0.9,
         "num_classes": config.NUM_CLASSES,
         "num_workers": args.num_workers,
+        "optimizer": "SGD",
         "random_seed": config.RANDOM_SEED,
         "resume": args.resume,
         "start_epoch": start_epoch,
         "train_augmentation": args.train_augmentation,
+        "weight_decay": 1e-4,
     }
+
+    if args.resume:
+        if not last_checkpoint_path.exists():
+            raise FileNotFoundError(f"Last checkpoint not found: {last_checkpoint_path}")
+        resume_state = load_checkpoint(
+            last_checkpoint_path,
+            model,
+            optimizer,
+            device,
+            expected_run_config=run_config,
+        )
+        start_epoch = resume_state["next_epoch"]
+        history = resume_state["history"]
+        best_val_top1 = resume_state["best_val_top1"]
+        run_config["start_epoch"] = start_epoch
+
     with (args.output_dir / "run_config.json").open("w", encoding="utf-8") as file:
         json.dump(run_config, file, indent=2)
 
@@ -190,7 +205,9 @@ def main():
         optimizer,
         device,
         args.epochs,
-        checkpoint_path=checkpoint_path,
+        best_checkpoint_path=best_checkpoint_path,
+        last_checkpoint_path=last_checkpoint_path,
+        run_config=run_config,
         start_epoch=start_epoch,
         history=history,
         best_val_top1=best_val_top1,
