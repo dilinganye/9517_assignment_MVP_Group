@@ -139,7 +139,7 @@ Committed data manifests live in `data/processed/`.
 |-- outputs/                 # Local experiment outputs, ignored by Git except README
 |-- scripts/                 # Lightweight project checks and manifest scripts
 |-- src/
-|   |-- advanced/            # Advanced directions such as Grad-CAM or robustness
+|   |-- advanced/            # Advanced directions such as CL, Grad-CAM, or robustness
 |   |-- data/                # Dataset and DataLoader utilities
 |   |-- deep_learning/       # CNN models and training code
 |   |-- traditional/         # Handcrafted features and classical classifiers
@@ -160,21 +160,27 @@ Committed data manifests live in `data/processed/`.
 
 ### Known Gaps and Report Guardrails
 
-- The pretrained 500-class baseline, its held-out test evaluation, and Grad-CAM remain incomplete; continual learning must wait for this required baseline.
+- The pretrained 500-class baseline, its held-out test evaluation, and Grad-CAM remain incomplete. CL task setup may proceed in parallel, but full CL training must not delay these required baseline deliverables.
 - `src.evaluation.evaluate_class_scores` is used by scratch evaluation. Traditional and pretrained routes must emit the same metric fields and comparable final artifacts before the final result table is assembled.
 - The lightweight CI checks syntax and manifests only. A separate dependency-installed synthetic deep-learning/evaluation smoke job remains a follow-up, not a full training job.
 
-### Instructor-Supported Continual Learning Direction
+### Continual Learning: Next-Stage Plan
 
-Based on course discussion in July 2026, a small class-incremental continual-learning experiment is a reasonable advanced direction. It is not implemented yet and does not replace the required baseline methods.
+Based on course discussion in July 2026, scratch-only class-incremental continual learning is the next D-owned advanced direction. This planning step fixes a deterministic 100-class subset and 10 tasks; it does not yet train a continual learner or replace the required baseline methods.
 
-- Select a fixed 100-class subset from the shared 500 classes and record the selected class IDs.
-- Split it into 10 sequential tasks with 10 classes per task.
-- Use ResNet18 and compare sequential training without replay against a small class-balanced replay memory of 2-5 images per previously seen class.
-- After each task, report current-task accuracy, old-class accuracy, seen-class accuracy, and average forgetting.
-- Where compute permits, compare scratch and ImageNet-pretrained ResNet18; joint training on the same 100 classes is an optional upper bound.
+- `data/processed/continual_100/class_tasks_100.csv` records the selected source labels, fixed 0-99 continual labels, task-local labels, and species metadata. Later code filters the existing shared manifests using this compact map rather than duplicating image lists.
+- Use a fixed 100-class scratch ResNet18 head and class-incremental evaluation over all seen classes, without providing a task ID at inference.
+- Compare sequential fine-tuning without replay against class-balanced experience replay with 2 and 5 stored images per earlier class.
+- After every task, save the task-by-task accuracy matrix, current-task accuracy, old-class accuracy, seen-class accuracy, and average forgetting. Tune settings only on validation data, then evaluate fixed configurations on test.
+- The plan follows the task-sequence and forgetting analysis in De Lange et al. and the small episodic-memory replay baseline in Chaudhry et al. Grad-CAM remains an independent E-owned advanced direction.
 
-ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The continual-learning work should start only after the required baselines have stable, comparable results.
+Create or verify the committed plan without GPU or image files:
+
+```bash
+python scripts/create_continual_task_plan.py --check
+```
+
+ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The next CL implementation step is a metric contract and synthetic smoke test, followed by sequential no-replay training and replay training.
 
 ### 当前进度
 
@@ -185,21 +191,27 @@ ImageNet-retention evaluation, complex replay selection, and 500-class continual
 
 ### 已知缺口与报告约束
 
-- pretrained 500 类 baseline、其 held-out test 评估和 Grad-CAM 尚未完成；在此之前不应启动持续学习主体实验。
+- pretrained 500 类 baseline、其 held-out test 评估和 Grad-CAM 尚未完成。CL 的任务计划可以并行准备，但完整 CL 训练不得延误这些必做 baseline。
 - `src.evaluation.evaluate_class_scores` 目前由 scratch 评估使用。传统和 pretrained 路线在最终结果表汇总前，必须输出相同指标字段和可比较的最终产物。
 - 轻量 CI 只检查语法和 manifest。一项安装依赖的合成 deep-learning/evaluation smoke job 仍是后续工作，但不应在 CI 中加入完整训练。
 
-### 教师认可的持续学习方向
+### 持续学习：下一阶段计划
 
-根据 2026 年 7 月的课程沟通，小规模 class-incremental continual learning 是合理的 advanced direction。该方向尚未实现，也不替代必做 baseline。
+根据 2026 年 7 月的课程沟通，基于 scratch 的小规模 class-incremental continual learning 是 D 的下一阶段 advanced direction。本 PR 只固定可复现的 100 类子集和 10 个任务，不训练 continual learner，也不替代必做 baseline。
 
-- 从共享的 500 类中固定选取 100 类，并记录选中的 class ID。
-- 划分为 10 个顺序任务，每个任务包含 10 类。
-- 使用 ResNet18，对比无 replay 的顺序训练与 class-balanced replay；每个已见类别保留 2-5 张图片。
-- 每完成一个任务后，报告当前任务准确率、旧类准确率、已见类准确率和平均遗忘量。
-- 算力允许时，对比 scratch 与 ImageNet-pretrained ResNet18；同一 100 类上的 joint training 仅作为可选 upper bound。
+- `data/processed/continual_100/class_tasks_100.csv` 记录被选中的 source label、固定的 0-99 continual label、任务内标签和物种元信息。后续代码会用这份紧凑映射过滤既有共享 manifest，而不复制图片路径清单。
+- 使用固定 100 类输出头的 scratch ResNet18，在推理时不提供 task ID，并对所有已见类别进行 class-incremental 评估。
+- 对比无 replay 的顺序微调与 class-balanced experience replay；每个旧类保留 2 和 5 张图片作为两个 memory budget。
+- 每完成一个 task 后保存 task-by-task accuracy matrix、current-task accuracy、old-class accuracy、seen-class accuracy 和 average forgetting。调参只用 validation，固定方案再进行 test 评估。
+- 方案参考 De Lange 等人的 task sequence/forgetting 分析，以及 Chaudhry 等人的小型 episodic-memory replay baseline。Grad-CAM 是 E 独立负责的 advanced direction。
 
-ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。持续学习工作应在必做 baseline 得到稳定且可比较的结果后再开始。
+无需 GPU 或图片文件，即可创建或核对已提交计划：
+
+```bash
+python scripts/create_continual_task_plan.py --check
+```
+
+ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。CL 的下一步实现是指标契约和合成 smoke test，然后才是 sequential no-replay 与 replay 训练。
 
 ## Collaboration Rules
 

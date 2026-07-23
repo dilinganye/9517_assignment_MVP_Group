@@ -21,7 +21,7 @@ jobs:
 
       - name: Compile lightweight Python modules
         run: |
-          python -m py_compile scripts/smoke_test.py scripts/summarize_data_manifests.py scripts/train_scratch_resnet18.py scripts/evaluate_scratch_resnet18.py scripts/analyze_scratch_evaluation.py src/config.py src/evaluation.py src/deep_learning/checkpoint.py src/deep_learning/trainer.py
+          python -m py_compile scripts/smoke_test.py scripts/summarize_data_manifests.py scripts/train_scratch_resnet18.py scripts/evaluate_scratch_resnet18.py scripts/analyze_scratch_evaluation.py scripts/create_continual_task_plan.py src/config.py src/evaluation.py src/advanced/continual_learning.py src/deep_learning/checkpoint.py src/deep_learning/trainer.py
 
       - name: Run manifest smoke test
         run: |
@@ -30,3 +30,7 @@ jobs:
       - name: Summarize data manifests
         run: |
           python scripts/summarize_data_manifests.py --output /tmp/manifest_summary.json
+
+      - name: Verify continual-learning task plan
+        run: |
+          python scripts/create_continual_task_plan.py --check

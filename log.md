@@ -35,7 +35,7 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-scratch-analysis-timing`
 - PR created: 2026-07-23 21:27:16 AEST
-- PR merged: pending
+- PR merged: 2026-07-23 21:32:37 AEST
 - Summary: add post-hoc scratch test analysis from saved predictions, record per-epoch and cumulative training time for future scratch runs, document the completed Colab timing observation, and refresh project status and known report guardrails.
 - Validation: `git diff --check`, Python compile-all, manifest smoke test, CPU synthetic trainer timing check, synthetic 500-class prediction-analysis artifacts, and both entry-point `--help` checks passed. No raw images, model weights, or test inference were run.
 
