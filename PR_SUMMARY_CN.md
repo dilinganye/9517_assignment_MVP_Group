@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #33 - Add continual task dataset adapter
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-task-dataset`
+- PR 创建时间：2026-07-24 20:55:31 AEST
+- PR 合并时间：待合并
+- 摘要：新增共享的持续学习数据适配器：按当前 task 或已见 tasks 过滤已提交 manifest，并将 source label 映射到固定 0-99 continual label。
+- 验证：`git diff --check`、Python compile-all、共享 manifest smoke test、持续学习任务计划检查、无依赖的当前/已见任务过滤 smoke test，以及本地 torch Dataset 对单 task 和已见 tasks 的标签重映射初始化检查均通过。未运行原始图片、GPU、trainer、replay、模型权重或 test 评估。
+
 ## PR #30 - Add continual learning task plan
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-cl-task-setup`
 - PR 创建时间：2026-07-23 22:40:43 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-23 22:48:02 AEST
 - 摘要：启动 D 负责的 scratch 持续学习方向：提交确定性的 100 类、10 任务映射，新增任务计划生成/校验命令和最小 CI 覆盖，并在中英文 README 记录 class-incremental、no-replay 与 class-balanced replay 的后续实验契约。
 - 验证：`git diff --check`、Python compile-all、manifest smoke test、manifest summary 生成、默认 seed 与替代 seed 的确定性任务计划检查，以及每个任务过滤后得到 400 train、100 validation、100 test 样本的检查均通过。未运行 GPU 训练、replay、模型权重或 test 评估。
 
