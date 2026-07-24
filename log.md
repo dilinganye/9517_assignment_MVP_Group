@@ -30,12 +30,21 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #35 - Add continual no-replay trainer
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-cl-no-replay`
+- PR created: 2026-07-24 22:21:10 AEST
+- PR merged: pending
+- Summary: add a CUDA-only sequential no-replay trainer for the fixed 100-class, 10-task study, with validation-only task-matrix artifacts and task-boundary resume checkpoints.
+- Validation: Python compile-all, shared manifest smoke test, continual task-plan, dataset, metric, and resume-guard smoke tests, training-entry help, synthetic 100-way head, and CPU task-boundary checkpoint round trips passed. No raw images, GPU training, replay, or test evaluation was run.
+
 ## PR #34 - Add continual learning metrics
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-cl-metrics`
 - PR created: 2026-07-24 21:40:00 AEST
-- PR merged: pending
+- PR merged: 2026-07-24 22:13:05 AEST
 - Summary: add a dependency-light class-incremental accuracy-matrix contract with current-task, old-task, seen-task, and average-forgetting summaries.
 - Validation: Python compile-all, deterministic synthetic metric smoke test, shared manifest smoke test, continual task-plan check, and continual task-dataset smoke test passed. No raw images, GPU work, trainer, replay, model weights, or test evaluation was run.
 
