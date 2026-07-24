@@ -208,7 +208,7 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ### 课程沟通结论
 
-根据 2026 年 7 月与课程教师的沟通，以下小规模 CNN class-incremental continual-learning 设计被认为合理，可作为 advanced direction。它不替代必做 baseline；当前已固定任务计划，训练与 replay 尚未实现。
+根据 2026 年 7 月与课程教师的沟通，以下小规模 CNN class-incremental continual-learning 设计被认为合理，可作为 advanced direction。它不替代必做 baseline；当前已固定任务计划、数据适配器和指标契约，训练与 replay 尚未实现。
 
 - 从共享的固定 500 类中选定并记录 100 个 class ID。
 - 将 100 类划分为 10 个顺序任务，每个任务 10 类。
@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #34 - Add continual learning metrics
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-metrics`
+- PR 创建时间：2026-07-24 21:40:00 AEST
+- PR 合并时间：待合并
+- 摘要：新增无第三方依赖的 class-incremental accuracy matrix 指标契约；每完成一个 task 后统一产出 current-task、old-task、seen-task accuracy 和 average forgetting。
+- 验证：Python compile-all、确定性的合成指标 smoke test、共享 manifest smoke test、持续学习任务计划检查和持续学习数据适配器 smoke test 均通过。未运行原始图片、GPU、trainer、replay、模型权重或 test 评估。
+
 ## PR #33 - Add continual task dataset adapter
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-cl-task-dataset`
 - PR 创建时间：2026-07-24 20:55:31 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-24 21:02:01 AEST
 - 摘要：新增共享的持续学习数据适配器：按当前 task 或已见 tasks 过滤已提交 manifest，并将 source label 映射到固定 0-99 continual label。
 - 验证：`git diff --check`、Python compile-all、共享 manifest smoke test、持续学习任务计划检查、无依赖的当前/已见任务过滤 smoke test，以及本地 torch Dataset 对单 task 和已见 tasks 的标签重映射初始化检查均通过。未运行原始图片、GPU、trainer、replay、模型权重或 test 评估。
 

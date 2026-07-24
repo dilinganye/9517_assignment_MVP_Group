@@ -30,12 +30,21 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #34 - Add continual learning metrics
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-cl-metrics`
+- PR created: 2026-07-24 21:40:00 AEST
+- PR merged: pending
+- Summary: add a dependency-light class-incremental accuracy-matrix contract with current-task, old-task, seen-task, and average-forgetting summaries.
+- Validation: Python compile-all, deterministic synthetic metric smoke test, shared manifest smoke test, continual task-plan check, and continual task-dataset smoke test passed. No raw images, GPU work, trainer, replay, model weights, or test evaluation was run.
+
 ## PR #33 - Add continual task dataset adapter
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-cl-task-dataset`
 - PR created: 2026-07-24 20:55:31 AEST
-- PR merged: pending
+- PR merged: 2026-07-24 21:02:01 AEST
 - Summary: add a shared continual-learning dataset adapter that filters the committed manifests by current or seen tasks and remaps source labels to fixed 0-99 continual labels.
 - Validation: `git diff --check`, Python compile-all, shared manifest smoke test, continual task-plan check, dependency-light current/seen-task filtering smoke test, and local torch dataset initialization with single-task and seen-task label remapping passed. No raw images, GPU work, trainer, replay, model weights, or test evaluation was run.
 
