@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #35 - Add continual no-replay trainer
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-no-replay`
+- PR 创建时间：2026-07-24 22:21:10 AEST
+- PR 合并时间：待合并
+- 摘要：新增固定 100 类、10 个顺序 task 的 CUDA-only sequential no-replay trainer；每完成一个 task 后仅在 validation 的所有已见 task 上评估，保存 accuracy matrix、本地训练记录和 task 边界恢复 checkpoint。
+- 验证：Python compile-all、共享 manifest smoke test、持续学习任务计划、数据适配器、指标和 resume guard smoke test、训练入口 help、合成 100-way 输出头，以及 CPU task-boundary checkpoint 往返均通过。未运行原始图片、GPU 训练、replay 或 test 评估。
+
 ## PR #34 - Add continual learning metrics
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-cl-metrics`
 - PR 创建时间：2026-07-24 21:40:00 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-24 22:13:05 AEST
 - 摘要：新增无第三方依赖的 class-incremental accuracy matrix 指标契约；每完成一个 task 后统一产出 current-task、old-task、seen-task accuracy 和 average forgetting。
 - 验证：Python compile-all、确定性的合成指标 smoke test、共享 manifest smoke test、持续学习任务计划检查和持续学习数据适配器 smoke test 均通过。未运行原始图片、GPU、trainer、replay、模型权重或 test 评估。
 
