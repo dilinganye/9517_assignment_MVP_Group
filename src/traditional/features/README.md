@@ -180,7 +180,6 @@ requests approximately 500 of the strongest keypoints. The returned number may b
 
 Every valid SIFT descriptor contains 128 values.
 
-
 ## Shared Configuration
 
 All notebooks use the shared project configuration:
