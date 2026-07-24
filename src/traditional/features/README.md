@@ -82,29 +82,61 @@ config.TEST_CSV
 
 Images are resized using `config.IMG_SIZE`, and all dataset paths come from `config.py`.
 
+### `sift.ipynb`
+
+Branch: `Chaohao_TraditionalFeature4`
+
+This notebook detects SIFT keypoints and extracts local descriptors from a PIL image.
+
+Reusable function:
+
+```python
+extract_sift_feature(image, max_features=500)
+```
+
+Main processing steps:
+
+1. Convert the image to RGB.
+2. Resize the image using `config.IMG_SIZE`.
+3. Convert the image to grayscale.
+4. Detect SIFT keypoints.
+5. Extract one 128-value descriptor for each keypoint.
+6. Visualise the detected keypoints.
+7. Test the extractor on images from different classes.
+8. Check descriptor shape, data type, and values.
+
+Output:
+
+```text
+Data type: float32
+Descriptor shape: (N, 128)
+```
+
+`N` is the number of detected keypoints and may be different for every image.
+
+The parameter:
+
+```python
+max_features=500
+```
+
+requests approximately 500 of the strongest keypoints. The returned number may be slightly different because SIFT can create multiple keypoints with different orientations at the same image location.
+
+Every valid SIFT descriptor contains 128 values.
+
 ## Validation
 
 | Feature | Shape | Data type |
 | --- | --- | --- |
-| HOG | `(6084,)` | `float32` |
-| RGB colour histogram | `(96,)` | `float32` |
-| Combined feature | `(6180,)` | `float32` |
+| HOG | `(6084,)` | `float32` | Fixed |
+| RGB colour histogram | `(96,)` | `float32` | Fixed |
+| Combined HOG and colour | `(6180,)` | `float32` | Fixed |
+| SIFT descriptors | `(N, 128)` | `float32` | Variable |
 
-Both methods were tested on images from different classes and produced fixed-length feature vectors.
+HOG and colour features describe the image using one fixed-length vector.
 
-## Current Branch
+SIFT describes multiple local regions in an image, so the number of descriptors depends on the detected keypoints.
 
-Current branch:
-
-`Chaohao_TraditionalFeature3`
-
-This branch continues the pipeline by combining the HOG and colour features.
-
-```text
-HOG:      6084
-Colour:     96
-Combined:    6180
-```
 
 ## Maintenance
 
