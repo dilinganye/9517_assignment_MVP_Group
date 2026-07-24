@@ -16,6 +16,7 @@ The full image archive is not stored in Git. The current packaged subset is arou
 - `train.csv`: training manifest with `file_path`, `label`, `category_id`, and `category_name`.
 - `val.csv`: validation manifest with the same columns as `train.csv`.
 - `test.csv`: held-out test manifest based on the official iNaturalist validation split.
+- `continual_100/class_tasks_100.csv`: compact seeded 100-class, 10-task mapping for the scratch continual-learning study; later code filters the three shared manifests with this map rather than duplicating image paths.
 
 已提交文件：
 
@@ -23,6 +24,7 @@ The full image archive is not stored in Git. The current packaged subset is arou
 - `train.csv`: 训练集清单，包含 `file_path`、`label`、`category_id` 和 `category_name`。
 - `val.csv`: 验证集清单，字段与 `train.csv` 相同。
 - `test.csv`: 独立测试集清单，基于官方 iNaturalist validation split。
+- `continual_100/class_tasks_100.csv`：scratch 持续学习实验使用的固定 100 类、10 个任务映射；后续代码用它过滤三份共享清单，不重复保存图片路径。
 
 The notebook that created these manifests also used a label mapping internally. A standalone `label_mapping.json` is not currently committed.
 
@@ -35,6 +37,7 @@ The notebook that created these manifests also used a label mapping internally. 
 - `train.csv` 是训练集清单。每一行对应一张训练图片，包含图片相对路径、训练标签、原始类别 ID 和类别名，用于模型训练阶段读取样本。
 - `val.csv` 是验证集清单。字段与 `train.csv` 相同，用于训练过程中的验证、调参和选择 checkpoint。
 - `test.csv` 是独立测试集清单。它基于官方 iNaturalist validation split，用于最终固定方案的测试评估；不应在训练调参阶段反复使用。
+- `continual_100/class_tasks_100.csv` 固定持续学习的类别选择、任务顺序、0-99 continual label 和任务内标签。它由 `scripts/create_continual_task_plan.py` 根据全局 seed 生成，并可用 `--check` 验证。
 
 ## Expected Split Sizes
 
@@ -85,4 +88,12 @@ Run the lightweight consistency check with:
 
 ```bash
 python scripts/smoke_test.py
+```
+
+Verify the continual-learning task plan with:
+
+用以下命令核对持续学习任务计划：
+
+```bash
+python scripts/create_continual_task_plan.py --check
 ```

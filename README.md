@@ -50,6 +50,46 @@ The same lightweight checks run in GitHub Actions for pull requests and pushes t
 
 同一组轻量检查也会在 GitHub Actions 中对 PR 和推送到 `main` 的提交自动运行。
 
+## Final Evaluation
+
+Select a model using validation results, then run the held-out test set once. For the
+scratch ResNet18 candidate trained with augmentation on Colab:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/evaluate_scratch_resnet18.py \
+  --checkpoint /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/augmentation_v1/best_checkpoint.pt \
+  --image-root /content/inat_data \
+  --output-dir /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation
+```
+
+The command writes `metrics.json`, `evaluation_config.json`, per-image
+`predictions.csv`, and the full confusion matrix as CSV and PNG. Analyse the
+saved predictions without rerunning test inference:
+
+```bash
+python scripts/analyze_scratch_evaluation.py \
+  --predictions /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/predictions.csv
+```
+
+This writes per-class precision/recall/F1, the most frequent species-confusion
+pairs, and a readable confusion plot for the lowest-recall classes. The shared
+`src.evaluation.evaluate_class_scores` helper defines the common Top-1, Top-5,
+overall accuracy, macro precision, macro recall, and macro F1 fields.
+
+先根据验证集选择模型，再只在保留的 test 集上运行一次最终评估。上面的 Colab
+命令使用带增强的 scratch ResNet18 候选模型。它会写入 `metrics.json`、
+`evaluation_config.json`、逐图片的 `predictions.csv`，以及 CSV 和 PNG 格式的完整
+混淆矩阵。无需再次运行 test 推理，即可分析已保存的预测：
+
+```bash
+python scripts/analyze_scratch_evaluation.py \
+  --predictions /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/predictions.csv
+```
+
+该脚本会写入每类 precision/recall/F1、最常见物种混淆对，以及针对 recall 最低类别的可读混淆图。共享的
+`src.evaluation.evaluate_class_scores` 规定 Top-1、Top-5、overall accuracy、macro
+precision、macro recall 和 macro F1 字段。
+
 ## Data Processing Notes
 
 数据处理提示：
@@ -99,7 +139,7 @@ Committed data manifests live in `data/processed/`.
 |-- outputs/                 # Local experiment outputs, ignored by Git except README
 |-- scripts/                 # Lightweight project checks and manifest scripts
 |-- src/
-|   |-- advanced/            # Advanced directions such as Grad-CAM or robustness
+|   |-- advanced/            # Advanced directions such as CL, Grad-CAM, or robustness
 |   |-- data/                # Dataset and DataLoader utilities
 |   |-- deep_learning/       # CNN models and training code
 |   |-- traditional/         # Handcrafted features and classical classifiers
@@ -108,6 +148,86 @@ Committed data manifests live in `data/processed/`.
 |-- PR_SUMMARY_CN.md         # Chinese infrastructure summary
 `-- requirements.txt
 ```
+
+## Project Progress and Advanced Direction
+
+### Current Status
+
+- The shared 500-class manifests, Dataset/DataLoader entry points, manifest checks, and lightweight CI are in place.
+- Traditional HOG and colour-histogram features, plus Linear SVM and Random Forest classifier baselines, are available. The final report must document SVM selection from validation results only; the current notebook commentary should not use test-set comparisons to justify a hyperparameter choice.
+- The scratch-CNN path now includes a randomly initialized ResNet18 factory, epoch-level trainer, loss and Top-1 history, training-time recording, curve plotting, best/last checkpoints with resume guards, and final test evaluation. The completed augmentation run reached validation Top-1 0.2458 at epoch 19 and held-out test Top-1 0.2440. Its Colab Tesla T4 cell showed approximately 46 minutes of wall-clock time; this is a manually observed historical record, while future runs write per-epoch and total timing automatically.
+- The pretrained-CNN path has a ResNet18 training and ablation notebook with a small end-to-end validation run. Full 500-class results and final evaluation remain outstanding.
+
+### Known Gaps and Report Guardrails
+
+- The pretrained 500-class baseline, its held-out test evaluation, and Grad-CAM remain incomplete. CL task setup may proceed in parallel, but full CL training must not delay these required baseline deliverables.
+- `src.evaluation.evaluate_class_scores` is used by scratch evaluation. Traditional and pretrained routes must emit the same metric fields and comparable final artifacts before the final result table is assembled.
+- The lightweight CI checks syntax and manifests only. A separate dependency-installed synthetic deep-learning/evaluation smoke job remains a follow-up, not a full training job.
+
+### Continual Learning: Next-Stage Plan
+
+Based on course discussion in July 2026, scratch-only class-incremental continual learning is the next D-owned advanced direction. The current setup fixes a deterministic 100-class subset and 10 tasks, exposes a task dataset adapter and metric contract, and provides a sequential no-replay trainer; it does not replace the required baseline methods.
+
+- `data/processed/continual_100/class_tasks_100.csv` records the selected source labels, fixed 0-99 continual labels, task-local labels, and species metadata. `src.data.create_continual_dataset(split, task_ids)` filters the existing shared manifests using this compact map rather than duplicating image lists.
+- Use a fixed 100-class scratch ResNet18 head and class-incremental evaluation over all seen classes, without providing a task ID at inference.
+- Compare sequential fine-tuning without replay against class-balanced experience replay with 2 and 5 stored images per earlier class.
+- After every task, save the task-by-task accuracy matrix, current-task accuracy, old-class accuracy, seen-class accuracy, and average forgetting. Tune settings only on validation data, then evaluate fixed configurations on test.
+- The plan follows the task-sequence and forgetting analysis in De Lange et al. and the small episodic-memory replay baseline in Chaudhry et al. Grad-CAM remains an independent E-owned advanced direction.
+
+Create or verify the committed plan without GPU or image files:
+
+```bash
+python scripts/create_continual_task_plan.py --check
+```
+
+Run the validation-only sequential baseline on CUDA; it saves a task-boundary checkpoint, `accuracy_matrix.json`, `task_metrics.csv`, and `training_history.csv` locally:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_no_replay.py \
+  --image-root /path/to/inat_data \
+  --output-dir outputs/continual_100/no_replay_v1
+```
+
+Use `--resume` with the same output directory only after a completed task. ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The next CL implementation step is class-balanced replay training.
+
+### 当前进度
+
+- 已具备共享的 500 类数据清单、Dataset/DataLoader 入口、manifest 检查和轻量 CI。
+- 传统 HOG 与颜色直方图特征、Linear SVM 和 Random Forest 分类 baseline 已具备。最终报告必须只用验证集说明 SVM 选择；当前 notebook 的说明不应再以 test 集比较来支撑超参数取舍。
+- Scratch CNN 已具备随机初始化 ResNet18、按 epoch 的 trainer、loss 和 Top-1 history、训练耗时记录、曲线绘图、best/last checkpoint 与 resume guard，以及最终 test 评估。已完成的 augmentation run 在第 19 个 epoch 达到 validation Top-1 0.2458，并取得 held-out test Top-1 0.2440。Colab Tesla T4 cell 显示约 46 分钟 wall-clock time；这是手动观察到的历史记录，后续运行会自动保存每个 epoch 和总训练耗时。
+- Pretrained CNN 已具备 ResNet18 训练和消融 Notebook，并完成小规模端到端流程验证；完整 500 类结果和最终评估仍未完成。
+
+### 已知缺口与报告约束
+
+- pretrained 500 类 baseline、其 held-out test 评估和 Grad-CAM 尚未完成。CL 的任务计划可以并行准备，但完整 CL 训练不得延误这些必做 baseline。
+- `src.evaluation.evaluate_class_scores` 目前由 scratch 评估使用。传统和 pretrained 路线在最终结果表汇总前，必须输出相同指标字段和可比较的最终产物。
+- 轻量 CI 只检查语法和 manifest。一项安装依赖的合成 deep-learning/evaluation smoke job 仍是后续工作，但不应在 CI 中加入完整训练。
+
+### 持续学习：下一阶段计划
+
+根据 2026 年 7 月的课程沟通，基于 scratch 的小规模 class-incremental continual learning 是 D 的下一阶段 advanced direction。当前已固定可复现的 100 类子集、10 个任务，提供 task dataset adapter、指标契约和 sequential no-replay trainer；它不替代必做 baseline。
+
+- `data/processed/continual_100/class_tasks_100.csv` 记录被选中的 source label、固定的 0-99 continual label、任务内标签和物种元信息。`src.data.create_continual_dataset(split, task_ids)` 会用这份紧凑映射过滤既有共享 manifest，而不复制图片路径清单。
+- 使用固定 100 类输出头的 scratch ResNet18，在推理时不提供 task ID，并对所有已见类别进行 class-incremental 评估。
+- 对比无 replay 的顺序微调与 class-balanced experience replay；每个旧类保留 2 和 5 张图片作为两个 memory budget。
+- 每完成一个 task 后保存 task-by-task accuracy matrix、current-task accuracy、old-class accuracy、seen-class accuracy 和 average forgetting。调参只用 validation，固定方案再进行 test 评估。
+- 方案参考 De Lange 等人的 task sequence/forgetting 分析，以及 Chaudhry 等人的小型 episodic-memory replay baseline。Grad-CAM 是 E 独立负责的 advanced direction。
+
+无需 GPU 或图片文件，即可创建或核对已提交计划：
+
+```bash
+python scripts/create_continual_task_plan.py --check
+```
+
+在 CUDA 上运行只使用 validation 的 sequential baseline；它会在每个 task 边界本地保存 checkpoint、`accuracy_matrix.json`、`task_metrics.csv` 和 `training_history.csv`：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_no_replay.py \
+  --image-root /path/to/inat_data \
+  --output-dir outputs/continual_100/no_replay_v1
+```
+
+只可在完成某个 task 后，对同一输出目录使用 `--resume`。ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。CL 的下一步实现是 class-balanced replay 训练。
 
 ## Collaboration Rules
 

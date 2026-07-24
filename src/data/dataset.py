@@ -6,6 +6,12 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 
 from src import config
+from src.advanced.continual_learning import (
+    filter_manifest_samples,
+    get_task_label_mapping,
+    load_class_task_plan,
+    normalise_task_ids,
+)
 
 PathLike = Union[str, Path]
 
@@ -60,6 +66,33 @@ class InatCsvDataset(Dataset):
         return image, label
 
 
+class ContinualTaskDataset(InatCsvDataset):
+    """Shared-manifest dataset filtered to one or more continual-learning tasks."""
+
+    def __init__(
+        self,
+        split: str,
+        task_ids,
+        image_root: Optional[PathLike] = None,
+        transform: Optional[Callable] = None,
+        target_transform: Optional[Callable] = None,
+        task_plan_csv: PathLike = config.CONTINUAL_CLASS_TASKS_CSV,
+    ):
+        self.manifest_csv = get_manifest_path(split)
+        self.image_root = Path(image_root) if image_root is not None else config.DATA_RAW_ROOT
+        self.transform = transform
+        self.target_transform = target_transform
+        self.task_plan_csv = Path(task_plan_csv)
+        task_rows = load_class_task_plan(
+            self.task_plan_csv,
+            config.CONTINUAL_NUM_CLASSES,
+            config.CONTINUAL_CLASSES_PER_TASK,
+        )
+        self.task_ids = normalise_task_ids(task_ids)
+        self.source_to_continual = get_task_label_mapping(task_rows, self.task_ids)
+        self.samples = filter_manifest_samples(self.manifest_csv, self.source_to_continual)
+
+
 def get_manifest_path(split: str) -> Path:
     """Return the shared manifest path for train, val, or test."""
 
@@ -83,6 +116,26 @@ def create_dataset(
         image_root=image_root,
         transform=transform,
         target_transform=target_transform,
+    )
+
+
+def create_continual_dataset(
+    split: str,
+    task_ids,
+    image_root: Optional[PathLike] = None,
+    transform: Optional[Callable] = None,
+    target_transform: Optional[Callable] = None,
+    task_plan_csv: PathLike = config.CONTINUAL_CLASS_TASKS_CSV,
+):
+    """Create a class-incremental dataset with fixed 0-99 target labels."""
+
+    return ContinualTaskDataset(
+        split,
+        task_ids,
+        image_root=image_root,
+        transform=transform,
+        target_transform=target_transform,
+        task_plan_csv=task_plan_csv,
     )
 
 

@@ -190,22 +190,154 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 3. 全部方法使用同一 test 集生成统一结果表，再选择正确、错误和高混淆类别样本进行分析。
 4. 主方案稳定后再考虑 28+ 的测试时图像退化鲁棒性扩展，避免扩展工作影响基本训练收敛、统一评估和报告质量。
 
+## 项目进度更新：CNN 持续学习 Advanced Direction
+
+### 当前进度
+
+- 共享 500 类 manifest、Dataset/DataLoader、轻量 smoke test 和 CI 已完成。
+- B/C 的 HOG、颜色直方图、特征缓存、Linear SVM 和 Random Forest baseline 已提交。最终报告需要只用验证集解释 SVM 的超参数选择；当前 notebook 不应再以 test 集比较支撑该选择。
+- D 的 scratch 路线已完成随机初始化 ResNet18、训练/验证 epoch、loss 与 Top-1 history、曲线绘图、best/last checkpoint 与 resume guard、最终 test 评估和结果后处理。`augmentation_v1` 在 Colab Tesla T4、batch size 64、two workers、20 epochs 下，cell 显示约 46 分钟 wall-clock time；这是手动观察的历史记录。最佳 validation Top-1 为 0.2458（epoch 19），固定 checkpoint 的 held-out test Top-1 为 0.2440、Top-5 为 0.4912。后续训练会自动记录逐 epoch 和累计训练时间。
+- E 的预训练 ResNet18 训练与消融 Notebook 已提交，并完成小规模端到端流程验证；完整 500 类训练结果、test 集最终评估和 Grad-CAM 仍待完成。
+
+### 阶段性复查后的待办与约束
+
+- E 必须完成 pretrained 500 类训练、验证集选择、held-out test 统一评估和 Grad-CAM。CL 的任务计划可与这些工作并行准备，但完整 CL 训练不得延误必做 baseline。
+- `src.evaluation.evaluate_class_scores` 目前只由 scratch 最终评估直接使用。传统和 pretrained 路线需要在最终结果汇总前对齐 Top-1、Top-5、overall accuracy、macro precision、macro recall、macro F1 及可审计的输出文件。
+- scratch 的 `analyze_scratch_evaluation.py` 只读取已保存的 `predictions.csv` 和 test manifest，不重新运行模型；它输出每类指标、最高频混淆物种对和最低 recall 类别的可读混淆图，供报告使用。
+- 当前 CI 仅覆盖语法和 manifest。后续可新增安装依赖的合成 deep-learning/evaluation smoke job，但不应在 CI 中下载数据或运行完整训练。
+
+### 课程沟通结论
+
+根据 2026 年 7 月与课程教师的沟通，以下小规模 CNN class-incremental continual-learning 设计被认为合理，可作为 advanced direction。它不替代必做 baseline；当前已固定任务计划、数据适配器和指标契约，训练与 replay 尚未实现。
+
+- 从共享的固定 500 类中选定并记录 100 个 class ID。
+- 将 100 类划分为 10 个顺序任务，每个任务 10 类。
+- 以 ResNet18 为 backbone，对比 no-replay 顺序训练与 class-balanced replay；replay memory 初始范围为每个已见类 2-5 张图片。
+- 每个任务后在所有已见类别上评估，报告 current-task accuracy、old-class accuracy、seen-class accuracy 和 average forgetting。
+- 算力允许时比较 scratch ResNet18 与 ImageNet-pretrained ResNet18；同一 100 类的 joint training 可以作为可选 upper bound。
+
+### 初始范围边界和执行顺序
+
+- 首先完成并固定传统、scratch CNN 与 pretrained CNN 的可比 baseline；CL 任务计划可并行准备，但训练不能影响主任务交付。
+- 初始实验只做 100 类、10 个任务和 no-replay / class-balanced replay 两组核心比较；不同 replay 策略可在主结果稳定后再扩展。
+- 不将 ImageNet 数据保留能力评估、复杂 memory selection、Bayesian/adapter 方法或 500 类持续学习纳入初始实现。
+- 每次 CL 实验应保存固定 class/task 划分、随机种子、模型来源（scratch 或 pretrained）、memory 预算、每任务指标和遗忘曲线，以便报告复现。
+
 ## Scratch CNN 起始 PR 记录
+
+## PR #35 - Add continual no-replay trainer
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-no-replay`
+- PR 创建时间：2026-07-24 22:21:10 AEST
+- PR 合并时间：待合并
+- 摘要：新增固定 100 类、10 个顺序 task 的 CUDA-only sequential no-replay trainer；每完成一个 task 后仅在 validation 的所有已见 task 上评估，保存 accuracy matrix、本地训练记录和 task 边界恢复 checkpoint。
+- 验证：Python compile-all、共享 manifest smoke test、持续学习任务计划、数据适配器、指标和 resume guard smoke test、训练入口 help、合成 100-way 输出头，以及 CPU task-boundary checkpoint 往返均通过。未运行原始图片、GPU 训练、replay 或 test 评估。
+
+## PR #34 - Add continual learning metrics
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-metrics`
+- PR 创建时间：2026-07-24 21:40:00 AEST
+- PR 合并时间：2026-07-24 22:13:05 AEST
+- 摘要：新增无第三方依赖的 class-incremental accuracy matrix 指标契约；每完成一个 task 后统一产出 current-task、old-task、seen-task accuracy 和 average forgetting。
+- 验证：Python compile-all、确定性的合成指标 smoke test、共享 manifest smoke test、持续学习任务计划检查和持续学习数据适配器 smoke test 均通过。未运行原始图片、GPU、trainer、replay、模型权重或 test 评估。
+
+## PR #33 - Add continual task dataset adapter
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-task-dataset`
+- PR 创建时间：2026-07-24 20:55:31 AEST
+- PR 合并时间：2026-07-24 21:02:01 AEST
+- 摘要：新增共享的持续学习数据适配器：按当前 task 或已见 tasks 过滤已提交 manifest，并将 source label 映射到固定 0-99 continual label。
+- 验证：`git diff --check`、Python compile-all、共享 manifest smoke test、持续学习任务计划检查、无依赖的当前/已见任务过滤 smoke test，以及本地 torch Dataset 对单 task 和已见 tasks 的标签重映射初始化检查均通过。未运行原始图片、GPU、trainer、replay、模型权重或 test 评估。
+
+## PR #30 - Add continual learning task plan
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-task-setup`
+- PR 创建时间：2026-07-23 22:40:43 AEST
+- PR 合并时间：2026-07-23 22:48:02 AEST
+- 摘要：启动 D 负责的 scratch 持续学习方向：提交确定性的 100 类、10 任务映射，新增任务计划生成/校验命令和最小 CI 覆盖，并在中英文 README 记录 class-incremental、no-replay 与 class-balanced replay 的后续实验契约。
+- 验证：`git diff --check`、Python compile-all、manifest smoke test、manifest summary 生成、默认 seed 与替代 seed 的确定性任务计划检查，以及每个任务过滤后得到 400 train、100 validation、100 test 样本的检查均通过。未运行 GPU 训练、replay、模型权重或 test 评估。
+
+## PR #29 - Add scratch timing and evaluation analysis
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-scratch-analysis-timing`
+- PR 创建时间：2026-07-23 21:27:16 AEST
+- PR 合并时间：2026-07-23 21:32:37 AEST
+- 摘要：新增对已保存 scratch test 预测的离线结果分析；为后续 scratch 训练记录逐 epoch 和累计耗时；记录已完成 Colab 训练的观察耗时；同步项目状态和报告约束。
+- 验证：`git diff --check`、Python compile-all、manifest smoke test、CPU 合成 trainer 计时检查、合成 500 类 prediction-analysis 产物检查，以及两个入口的 `--help` 检查均通过。未运行原始图片、模型权重或 test 推理。
 
 ## PR #10 - Add scratch ResNet18 factory
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-scratch-resnet18`
 - PR 创建时间：2026-07-17 23:46:17 AEST
-- PR 合并时间：待合并后补充
+- PR 合并时间：2026-07-17 23:49:26 AEST
 - 摘要：新增 D 负责的随机初始化 ResNet18 工厂，使用共享的 500 类配置和 `weights=None`；本 PR 不包含 trainer、checkpoint、预训练模型或 Grad-CAM。
 - 验证：`git diff --check`、Python 语法编译和 `python scripts/smoke_test.py` 通过。由于本机环境未安装 PyTorch，未在本地实例化模型。
+
+## PR #15 - Add scratch trainer
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-scratch-trainer`
+- PR 创建时间：2026-07-18 22:18:55 AEST
+- PR 合并时间：2026-07-18 22:21:32 AEST
+- 摘要：新增 D 负责的最小 scratch trainer：训练与验证 epoch、默认交叉熵、device 管理、loss 与 Top-1 指标、逐 epoch history，以及训练曲线绘图。
+- 验证：`git diff --check`、Python 语法编译、使用 500 类合成标签进行两轮 CPU 训练/验证及曲线生成，以及 `python scripts/smoke_test.py` 均通过。
+
+## PR #16 - Add scratch checkpoint support
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-scratch-checkpoint`
+- PR 创建时间：2026-07-18 22:52:57 AEST
+- PR 合并时间：2026-07-18 22:58:16 AEST
+- 摘要：新增基于最佳验证集 Top-1 的 checkpoint 保存，以及恢复模型、optimizer、history 和下一轮 epoch 的 helper。
+- 验证：`git diff --check`、Python 语法编译、合成 CPU checkpoint 保存与恢复（含模型和 SGD momentum state）并继续训练一轮，以及 `python scripts/smoke_test.py` 均通过。
+
+## PR #20 - Add CUDA scratch training entry point
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-scratch-training-entry`
+- PR 创建时间：2026-07-21 22:49:02 AEST
+- PR 合并时间：2026-07-21 23:20:53 AEST
+- 摘要：新增仅使用 CUDA 的 scratch ResNet18 训练入口，串接共享 manifest、数据加载、随机初始化模型、trainer、最佳 checkpoint 恢复和本地实验产物。
+- 验证：`git diff --check`、Python 语法编译、直接运行 `--help`、history CSV 与 transform helper smoke test、CUDA 不可用保护检查，以及 `python scripts/smoke_test.py` 均通过。完整训练需要 NVIDIA CUDA 和本地原始图片，当前环境不具备。
+
+## PR #25 - Add scratch training augmentation
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-scratch-train-augmentation`
+- PR 创建时间：2026-07-22 22:54:42 AEST
+- PR 合并时间：2026-07-22 22:58:07 AEST
+- 摘要：新增 opt-in 的训练集增强开关，用于与已完成的无增强 scratch ResNet18 baseline 进行受控比较；验证集保持固定 Resize，不使用随机增强。
+- 验证：`git diff --check`、Python 语法编译、直接运行 `--help`、固定及增强 transform 与 history CSV helper 检查、CUDA 不可用保护检查，以及 `python scripts/smoke_test.py` 均通过。完整 CUDA 训练留在 Colab 执行。
+
+## PR #26 - Add unified final evaluation
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-unified-final-evaluation`
+- PR 创建时间：2026-07-23 00:02:25 AEST
+- PR 合并时间：2026-07-23 00:06:35 AEST
+- 摘要：新增共享分类指标，以及 CUDA scratch ResNet18 的 test 集入口；输出统一的本地评估产物格式。
+- 验证：`git diff --check`、与 CI 等价的 Python 语法编译、合成 500 类共享指标检查、prediction CSV 与混淆矩阵图产物检查、checkpoint 兼容性、缺少 checkpoint 与 CUDA 不可用保护检查，以及 `python scripts/smoke_test.py` 均通过。完整 CUDA test 集评估留在 Colab 执行。
+
+## PR #28 - Add safe scratch resume checkpoints
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-last-checkpoint-resume-guard`
+- PR 创建时间：2026-07-23 20:45:46 AEST
+- PR 合并时间：2026-07-23 20:48:12 AEST
+- 摘要：分别保存 scratch 的最佳和最新 checkpoint，并拒绝训练关键配置不一致的 resume。
+- 验证：`git diff --check`、与 CI 等价的 Python 语法编译、直接运行训练入口 `--help`、合成 CPU best/last checkpoint 往返、resume 配置不匹配拒绝、旧 checkpoint 可评估但被拒绝 resume，以及 `python scripts/smoke_test.py` 均通过。完整 CUDA 训练留在 Colab 执行。
 
 
 
 ## Pretrained CNN 起始 PR 记录
 
-## PR #<11> - Add pretrained ResNet18 training and ablation notebook
+## PR #<13> - Add pretrained ResNet18 training and ablation notebook
 
 - 作者：Guohao Lin
 - 分支：`<guohao_lin-pretrained+CAM>`
@@ -214,3 +346,15 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 - 摘要：新增 E 负责的 `E01_Pretrained_Training_and_Ablations.ipynb`，使用 ImageNet 预训练 ResNet18 和共享的 500 类数据配置。Notebook 包含图像预处理、数据增强、500 类分类头替换、冻结与解冻控制、分阶段微调、训练与验证循环、checkpoint、断点续训、训练历史保存，以及 main、no augmentation 和 head only 三组实验入口。Colab 默认直接从 Google Drive 按需读取图片，不要求复制完整训练集到 `/content`。
 - 范围：本 PR 只提供预训练模型训练和消融实验入口，不包含完整训练结果、test set 最终评估、混淆矩阵、Grad-CAM 或报告中的最终实验结论。
 - 验证：Notebook 文件格式和 Python code cell 语法检查通过；运行 `python scripts/smoke_test.py` 检查共享数据 manifest。完整模型训练和真实性能结果将在后续实验中生成。
+
+
+
+## PR #18 - Add pretrained ResNet18 training and ablation notebook
+
+- 作者：Guohao Lin
+- 分支：`guohaolin_E01.1`
+- PR 创建时间：2026-07-21 15:49:01 AEST
+- PR 合并时间：2026-07-21 15:49:34 AEST
+- 摘要：新增 E 负责的 `E01_Pretrained_Training_and_Ablations.ipynb`，使用 ImageNet 预训练 ResNet18 和共享的 500 类数据配置。Notebook 包含数据路径检查、图像预处理、数据增强、500 类分类层替换、冻结与分阶段解冻、训练与验证循环、Top-1、Top-5 和 Macro-F1 指标计算、checkpoint 保存、断点续训、训练历史保存，以及 `main`、`no_augmentation` 和 `head_only` 三组实验入口。
+- 范围：本 PR 只提供预训练 ResNet18 的训练和消融实验流程，不包含完整 500 类训练结果、test set 最终评估、混淆矩阵、predictions.csv、Grad-CAM、鲁棒性实验或报告中的最终实验结论。
+- 验证：Notebook 文件格式和 Python code cell 语法检查通过；运行 `python scripts/smoke_test.py` 检查共享数据 manifest；使用 64 张训练图片和 32 张验证图片完成 1 epoch 小规模训练测试，确认数据读取、模型前向传播、反向传播、验证、checkpoint、`history.csv` 和训练曲线生成流程正常。完整训练和真实性能结果将在后续 Colab GPU 实验中生成。
