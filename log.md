@@ -252,6 +252,6 @@ When this file is updated, use this format:
 - Author: Chaohao Liu
 - Branch: `Chaohao_TraditionalFeature4`
 - PR created: 2026-07-24 22:39 AEST
-- PR merged: pending
+- PR merged: 2026-07-24 22:42 AEST
 - Summary: Added `sift.ipynb` to implement SIFT keypoint detection and local descriptor extraction. The notebook accepts a PIL image, resizes it using the shared configuration, converts it to grayscale, and extracts SIFT keypoints with 128-dimensional descriptors. It also visualises the detected keypoints, displays a sample descriptor, and tests the extractor on images from different classes. The feature README was updated to document the SIFT implementation and explain that SIFT produces a variable-length output.
 - Validation: The notebook was run from top to bottom without errors. Each SIFT descriptor had 128 values and used the `float32` data type. The number of keypoints matched the number of descriptor rows, and all descriptor values were finite. The tests also confirmed that different images may produce different numbers of descriptors. The `max_features=500` setting requests approximately 500 strong keypoints and is not treated as a strict upper limit.
