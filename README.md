@@ -166,7 +166,7 @@ Committed data manifests live in `data/processed/`.
 
 ### Continual Learning: Next-Stage Plan
 
-Based on course discussion in July 2026, scratch-only class-incremental continual learning is the next D-owned advanced direction. The current setup fixes a deterministic 100-class subset and 10 tasks, exposes a task dataset adapter, and defines a metric contract; it does not yet train a continual learner or replace the required baseline methods.
+Based on course discussion in July 2026, scratch-only class-incremental continual learning is the next D-owned advanced direction. The current setup fixes a deterministic 100-class subset and 10 tasks, exposes a task dataset adapter and metric contract, and provides a sequential no-replay trainer; it does not replace the required baseline methods.
 
 - `data/processed/continual_100/class_tasks_100.csv` records the selected source labels, fixed 0-99 continual labels, task-local labels, and species metadata. `src.data.create_continual_dataset(split, task_ids)` filters the existing shared manifests using this compact map rather than duplicating image lists.
 - Use a fixed 100-class scratch ResNet18 head and class-incremental evaluation over all seen classes, without providing a task ID at inference.
@@ -180,7 +180,15 @@ Create or verify the committed plan without GPU or image files:
 python scripts/create_continual_task_plan.py --check
 ```
 
-ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The next CL implementation step is sequential no-replay training, followed by replay training.
+Run the validation-only sequential baseline on CUDA; it saves a task-boundary checkpoint, `accuracy_matrix.json`, `task_metrics.csv`, and `training_history.csv` locally:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_no_replay.py \
+  --image-root /path/to/inat_data \
+  --output-dir outputs/continual_100/no_replay_v1
+```
+
+Use `--resume` with the same output directory only after a completed task. ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The next CL implementation step is class-balanced replay training.
 
 ### 当前进度
 
@@ -197,7 +205,7 @@ ImageNet-retention evaluation, complex replay selection, and 500-class continual
 
 ### 持续学习：下一阶段计划
 
-根据 2026 年 7 月的课程沟通，基于 scratch 的小规模 class-incremental continual learning 是 D 的下一阶段 advanced direction。当前已固定可复现的 100 类子集、10 个任务，提供 task dataset adapter 并定义指标契约；不训练 continual learner，也不替代必做 baseline。
+根据 2026 年 7 月的课程沟通，基于 scratch 的小规模 class-incremental continual learning 是 D 的下一阶段 advanced direction。当前已固定可复现的 100 类子集、10 个任务，提供 task dataset adapter、指标契约和 sequential no-replay trainer；它不替代必做 baseline。
 
 - `data/processed/continual_100/class_tasks_100.csv` 记录被选中的 source label、固定的 0-99 continual label、任务内标签和物种元信息。`src.data.create_continual_dataset(split, task_ids)` 会用这份紧凑映射过滤既有共享 manifest，而不复制图片路径清单。
 - 使用固定 100 类输出头的 scratch ResNet18，在推理时不提供 task ID，并对所有已见类别进行 class-incremental 评估。
@@ -211,7 +219,15 @@ ImageNet-retention evaluation, complex replay selection, and 500-class continual
 python scripts/create_continual_task_plan.py --check
 ```
 
-ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。CL 的下一步实现是 sequential no-replay 训练，之后才是 replay 训练。
+在 CUDA 上运行只使用 validation 的 sequential baseline；它会在每个 task 边界本地保存 checkpoint、`accuracy_matrix.json`、`task_metrics.csv` 和 `training_history.csv`：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_no_replay.py \
+  --image-root /path/to/inat_data \
+  --output-dir outputs/continual_100/no_replay_v1
+```
+
+只可在完成某个 task 后，对同一输出目录使用 `--resume`。ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。CL 的下一步实现是 class-balanced replay 训练。
 
 ## Collaboration Rules
 

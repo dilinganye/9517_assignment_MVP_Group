@@ -15,6 +15,7 @@ from src.advanced.continual_metrics import (
     record_accuracy_row,
     summarize_after_task,
 )
+from src.advanced.continual_no_replay import validate_no_replay_resume_config
 
 __all__ = [
     "build_class_task_plan",
@@ -27,5 +28,6 @@ __all__ = [
     "record_accuracy_row",
     "summarize_after_task",
     "validate_class_task_plan",
+    "validate_no_replay_resume_config",
     "average_forgetting",
 ]

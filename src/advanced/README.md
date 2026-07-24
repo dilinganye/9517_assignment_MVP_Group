@@ -11,3 +11,8 @@ are separate follow-up steps.
 after every completed task: current-task, old-task, seen-task accuracy, and
 average forgetting. The next step is sequential no-replay training that fills
 this matrix; replay remains a separate comparison.
+
+`continual_no_replay.py` guards task-boundary resume settings for the initial
+sequential no-replay baseline. Its CUDA entry point is
+`scripts/train_continual_no_replay.py`; it trains on the current task only and
+writes validation-only matrix artifacts after each task.
