@@ -242,7 +242,16 @@ When this file is updated, use this format:
 
 - Author: Chaohao Liu
 - Branch: `Chaohao_TraditionalFeature5`
-- PR created: pending
-- PR merged: pending
+- PR created: 2026-07-22 22:09 AEST
+- PR merged: 2026-07-22 22:13 AEST
 - Summary: Added `features.ipynb` to apply the combined HOG and RGB colour feature extractor to the complete training, validation, and test datasets. Each image is converted into a `float32` feature vector with shape `(6180,)`, containing 6084 HOG values and 96 RGB colour histogram values. The extracted features, labels, and image paths are saved as compressed `.npz` files in `outputs/traditional_features/`. Added `cache.ipynb` to load these feature files and prepare `X_train`, `X_val`, and `X_test` with their corresponding labels and image paths for `traditional_classifier.ipynb`. The notebook also includes simple visualisations of the dataset split sizes and a sample cached feature vector.
 - Validation: `features.ipynb` successfully produced fixed-length feature matrices for the training, validation, and test datasets. All feature matrices used the `float32` data type, contained no missing or infinite values, and matched the numbers of labels and image paths. The saved `.npz` files were loaded successfully by `cache.ipynb`, and the returned variable names and shapes matched the inputs expected by `traditional_classifier.ipynb`. There is no error.
+
+## PR #36 - SIFT Feature Extraction
+
+- Author: Chaohao Liu
+- Branch: `Chaohao_TraditionalFeature4`
+- PR created: 2026-07-24 22:39 AEST
+- PR merged: 2026-07-24 22:42 AEST
+- Summary: Added `sift.ipynb` to implement SIFT keypoint detection and local descriptor extraction. The notebook accepts a PIL image, resizes it using the shared configuration, converts it to grayscale, and extracts SIFT keypoints with 128-dimensional descriptors. It also visualises the detected keypoints, displays a sample descriptor, and tests the extractor on images from different classes. The feature README was updated to document the SIFT implementation and explain that SIFT produces a variable-length output.
+- Validation: The notebook was run from top to bottom without errors. Each SIFT descriptor had 128 values and used the `float32` data type. The number of keypoints matched the number of descriptor rows, and all descriptor values were finite. The tests also confirmed that different images may produce different numbers of descriptors. The `max_features=500` setting requests approximately 500 strong keypoints and is not treated as a strict upper limit.

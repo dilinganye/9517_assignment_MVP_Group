@@ -138,6 +138,48 @@ These variables match the inputs expected by `traditional_classifier.ipynb`.
 
 The notebook also displays the dataset split sizes and a sample cached feature vector. It does not repeat the complete feature validation already performed in `features.ipynb`.
 
+### `sift.ipynb`
+
+Branch: `Chaohao_TraditionalFeature4`
+
+This notebook detects SIFT keypoints and extracts local descriptors from a PIL image.
+
+Reusable function:
+
+```python
+extract_sift_feature(image, max_features=500)
+```
+
+Main processing steps:
+
+1. Convert the image to RGB.
+2. Resize the image using `config.IMG_SIZE`.
+3. Convert the image to grayscale.
+4. Detect SIFT keypoints.
+5. Extract one 128-value descriptor for each keypoint.
+6. Visualise the detected keypoints.
+7. Test the extractor on images from different classes.
+8. Check descriptor shape, data type, and values.
+
+Output:
+
+```text
+Data type: float32
+Descriptor shape: (N, 128)
+```
+
+`N` is the number of detected keypoints and may be different for every image.
+
+The parameter:
+
+```python
+max_features=500
+```
+
+requests approximately 500 of the strongest keypoints. The returned number may be slightly different because SIFT can create multiple keypoints with different orientations at the same image location.
+
+Every valid SIFT descriptor contains 128 values.
+
 ## Shared Configuration
 
 All notebooks use the shared project configuration:
@@ -146,39 +188,73 @@ All notebooks use the shared project configuration:
 from src import config
 ```
 
-The main settings are:
+The shared configuration provides:
+
+- project paths
+- dataset CSV paths
+- image size
+- random seed
+- number of classes
+
+Images are resized using:
 
 ```python
 config.IMG_SIZE
-config.DATA_RAW_ROOT
+```
+
+Dataset manifests are loaded using:
+
+```python
 config.TRAIN_CSV
 config.VAL_CSV
 config.TEST_CSV
 ```
 
-Images are resized using `config.IMG_SIZE`, and all dataset paths come from `config.py`.
+Raw images are loaded from:
+
+```python
+config.DATA_RAW_ROOT
+```
+
+Personal absolute paths should not be added to the notebooks.
+
+## Data Location
+
+Raw images should be stored locally under:
+
+```text
+data/raw/
+├── train_mini/
+└── val/
+```
+
+Dataset manifests are stored under:
+
+```text
+data/processed/
+├── train.csv
+├── val.csv
+└── test.csv
+```
+
+The raw image files are not committed to Git.
 
 ## Validation
 
 | Feature | Shape | Data type |
 | --- | --- | --- |
-| HOG | `(6084,)` | `float32` |
-| RGB colour histogram | `(96,)` | `float32` |
-| Combined feature | `(6180,)` | `float32` |
-| Full dataset feature matrix | `(N, 6180)` | `float32` |
+| HOG | `(6084,)` | `float32` | Fixed |
+| RGB colour histogram | `(96,)` | `float32` | Fixed |
+| Combined HOG and colour | `(6180,)` | `float32` | Fixed |
+| SIFT descriptors | `(N, 128)` | `float32` | Variable |
 
-The feature extraction methods were tested on images from different classes.
-
-The dataset feature notebook also checks that:
-
-- every image produces a feature vector with length `6180`
-- all feature values are finite
-- the numbers of features, labels, and image paths match
-- the saved `.npz` files can be loaded correctly
+Both methods were tested on images from different classes and produced fixed-length feature vectors.
 
 ## Current Branch
 
-Current branch: `Chaohao_TraditionalFeature3`
+Current branch:
+
+`Chaohao_TraditionalFeature3`
 
 This branch continues the pipeline by combining the HOG and colour features.
 
@@ -186,35 +262,6 @@ This branch continues the pipeline by combining the HOG and colour features.
 HOG:      6084
 Colour:     96
 Combined:    6180
-```
-
-Current branch: `Chaohao_TraditionalFeature5`
-
-This branch applies the combined HOG and colour feature extractor to the complete dataset.
-
-```text
-Single image:        (6180,)
-Full dataset:        (N, 6180)
-```
-
-The extracted train, validation, and test features are saved in:
-
-```text
-outputs/traditional_features/
-```
-
-These files can be used directly for traditional classifier training.
-
-## Downloading Cached Features
-
-The generated traditional feature files are shared through OneDrive:
-
-[Download traditional feature files](https://unsw-my.sharepoint.com/:f:/g/personal/z5528581_ad_unsw_edu_au/IgAsAxZV1fJQSbL1AAmSgGoaAU-ZRhVTJmVLsHFxH7leipA?e=beAfW7)
-
-After downloading, place the files in:
-
-```text
-outputs/traditional_features/
 ```
 
 ## Maintenance
