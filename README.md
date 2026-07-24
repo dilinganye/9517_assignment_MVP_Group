@@ -166,9 +166,9 @@ Committed data manifests live in `data/processed/`.
 
 ### Continual Learning: Next-Stage Plan
 
-Based on course discussion in July 2026, scratch-only class-incremental continual learning is the next D-owned advanced direction. This planning step fixes a deterministic 100-class subset and 10 tasks; it does not yet train a continual learner or replace the required baseline methods.
+Based on course discussion in July 2026, scratch-only class-incremental continual learning is the next D-owned advanced direction. The current setup fixes a deterministic 100-class subset and 10 tasks, and exposes a task dataset adapter; it does not yet train a continual learner or replace the required baseline methods.
 
-- `data/processed/continual_100/class_tasks_100.csv` records the selected source labels, fixed 0-99 continual labels, task-local labels, and species metadata. Later code filters the existing shared manifests using this compact map rather than duplicating image lists.
+- `data/processed/continual_100/class_tasks_100.csv` records the selected source labels, fixed 0-99 continual labels, task-local labels, and species metadata. `src.data.create_continual_dataset(split, task_ids)` filters the existing shared manifests using this compact map rather than duplicating image lists.
 - Use a fixed 100-class scratch ResNet18 head and class-incremental evaluation over all seen classes, without providing a task ID at inference.
 - Compare sequential fine-tuning without replay against class-balanced experience replay with 2 and 5 stored images per earlier class.
 - After every task, save the task-by-task accuracy matrix, current-task accuracy, old-class accuracy, seen-class accuracy, and average forgetting. Tune settings only on validation data, then evaluate fixed configurations on test.
@@ -197,9 +197,9 @@ ImageNet-retention evaluation, complex replay selection, and 500-class continual
 
 ### 持续学习：下一阶段计划
 
-根据 2026 年 7 月的课程沟通，基于 scratch 的小规模 class-incremental continual learning 是 D 的下一阶段 advanced direction。本 PR 只固定可复现的 100 类子集和 10 个任务，不训练 continual learner，也不替代必做 baseline。
+根据 2026 年 7 月的课程沟通，基于 scratch 的小规模 class-incremental continual learning 是 D 的下一阶段 advanced direction。当前已固定可复现的 100 类子集、10 个任务并提供 task dataset adapter，不训练 continual learner，也不替代必做 baseline。
 
-- `data/processed/continual_100/class_tasks_100.csv` 记录被选中的 source label、固定的 0-99 continual label、任务内标签和物种元信息。后续代码会用这份紧凑映射过滤既有共享 manifest，而不复制图片路径清单。
+- `data/processed/continual_100/class_tasks_100.csv` 记录被选中的 source label、固定的 0-99 continual label、任务内标签和物种元信息。`src.data.create_continual_dataset(split, task_ids)` 会用这份紧凑映射过滤既有共享 manifest，而不复制图片路径清单。
 - 使用固定 100 类输出头的 scratch ResNet18，在推理时不提供 task ID，并对所有已见类别进行 class-incremental 评估。
 - 对比无 replay 的顺序微调与 class-balanced experience replay；每个旧类保留 2 和 5 张图片作为两个 memory budget。
 - 每完成一个 task 后保存 task-by-task accuracy matrix、current-task accuracy、old-class accuracy、seen-class accuracy 和 average forgetting。调参只用 validation，固定方案再进行 test 评估。
