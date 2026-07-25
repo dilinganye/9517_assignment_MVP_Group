@@ -146,8 +146,12 @@ def create_dataloader(
     num_workers: int = 0,
     pin_memory: bool = False,
     drop_last: bool = False,
+    sampler=None,
 ) -> DataLoader:
     """Create a DataLoader with project-default explicit options."""
+
+    if sampler is not None and shuffle:
+        raise ValueError("shuffle must be False when sampler is provided")
 
     return DataLoader(
         dataset,
@@ -156,4 +160,5 @@ def create_dataloader(
         num_workers=num_workers,
         pin_memory=pin_memory,
         drop_last=drop_last,
+        sampler=sampler,
     )
