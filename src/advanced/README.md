@@ -16,3 +16,8 @@ this matrix; replay remains a separate comparison.
 sequential no-replay baseline. Its CUDA entry point is
 `scripts/train_continual_no_replay.py`; it trains on the current task only and
 writes validation-only matrix artifacts after each task.
+
+`continual_replay.py` provides deterministic class-balanced memory selection
+and replay-specific resume guards. `scripts/train_continual_replay.py` trains
+on the current task plus `M` stored examples per old class, then saves the
+same validation metrics together with memory manifests and summaries.

@@ -30,12 +30,21 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #39 - Add continual replay trainer
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-cl-replay`
+- PR created: 2026-07-25 20:32:22 AEST
+- PR merged: pending
+- Summary: add deterministic class-balanced replay memory and a CUDA scratch replay trainer that saves validation metrics, memory manifests, and task-boundary recovery state.
+- Validation: Python compile-all, shared manifest smoke test, continual task-plan, dataset, metric, no-replay, and replay-memory smoke tests, replay-entry help, a current-task plus old-memory dataset check, and a CPU replay-checkpoint round trip passed. No raw images, GPU training, replay results, or test evaluation was run.
+
 ## PR #38 - Add D Colab execution notebook
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-d-colab-execution`
 - PR created: 2026-07-25 20:19:04 AEST
-- PR merged: pending
+- PR merged: 2026-07-25 20:21:25 AEST
 - Summary: add a clean Colab notebook that documents the completed D scratch and continual no-replay execution workflow, while keeping raw data and generated Drive artifacts outside Git.
 - Validation: notebook JSON structure, 29 clean cells with no saved outputs, command paths against the existing D scripts, and `git diff --check` passed. No data, model weights, predictions, or result figures were committed.
 

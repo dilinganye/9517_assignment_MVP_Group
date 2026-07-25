@@ -188,7 +188,21 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_no_replay.py \
   --output-dir outputs/continual_100/no_replay_v1
 ```
 
-Use `--resume` with the same output directory only after a completed task. ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The next CL implementation step is class-balanced replay training.
+Use `--resume` with the same output directory only after a completed task. Run the two fixed replay budgets in separate directories while keeping all other settings equal to the no-replay baseline:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_replay.py \
+  --image-root /path/to/inat_data \
+  --memory-per-class 2 \
+  --output-dir outputs/continual_100/replay_m2_v1
+
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_replay.py \
+  --image-root /path/to/inat_data \
+  --memory-per-class 5 \
+  --output-dir outputs/continual_100/replay_m5_v1
+```
+
+ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The next CL step after these validation comparisons is fixed-configuration held-out test evaluation.
 
 ### 当前进度
 
@@ -227,7 +241,21 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_no_replay.py \
   --output-dir outputs/continual_100/no_replay_v1
 ```
 
-只可在完成某个 task 后，对同一输出目录使用 `--resume`。ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。CL 的下一步实现是 class-balanced replay 训练。
+只可在完成某个 task 后，对同一输出目录使用 `--resume`。在保持其余设置与 no-replay baseline 一致的前提下，使用独立目录运行两个固定 replay budget：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_replay.py \
+  --image-root /path/to/inat_data \
+  --memory-per-class 2 \
+  --output-dir outputs/continual_100/replay_m2_v1
+
+CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_replay.py \
+  --image-root /path/to/inat_data \
+  --memory-per-class 5 \
+  --output-dir outputs/continual_100/replay_m5_v1
+```
+
+ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。完成这些 validation 对比后的 CL 下一步是固定配置的 held-out test 评估。
 
 ## Collaboration Rules
 
