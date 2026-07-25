@@ -56,6 +56,12 @@ def parse_args():
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--train-augmentation", action="store_true")
     parser.add_argument(
+        "--evaluation-split",
+        choices=("val", "test"),
+        default="val",
+        help="evaluate seen tasks at each task boundary on this held-out split",
+    )
+    parser.add_argument(
         "--class-balanced-sampling",
         action="store_true",
         help="sample the combined current and replay dataset with equal class probability",
@@ -73,6 +79,7 @@ def create_run_config(args):
         "class_balanced_sampling": args.class_balanced_sampling,
         "classes_per_task": config.CONTINUAL_CLASSES_PER_TASK,
         "continual_num_classes": config.CONTINUAL_NUM_CLASSES,
+        "evaluation_split": args.evaluation_split,
         "epochs_per_task": args.epochs_per_task,
         "git_commit": get_git_commit(),
         "image_mean": config.IMG_MEAN,
@@ -126,11 +133,11 @@ def create_replay_train_loader(task_id, memory_samples, image_root, transform, a
     )
 
 
-def create_validation_loader(task_id, image_root, transform, args):
-    """Create deterministic validation data for exactly one continual task."""
+def create_evaluation_loader(split, task_id, image_root, transform, args):
+    """Create deterministic evaluation data for exactly one continual task."""
 
     dataset = create_continual_dataset(
-        "val",
+        split,
         task_id,
         image_root=image_root,
         transform=transform,
@@ -144,13 +151,22 @@ def create_validation_loader(task_id, image_root, transform, args):
     )
 
 
-def save_artifacts(output_dir, run_config, matrix, history_rows, summary_rows, memory_rows, memory_samples):
-    """Write auditable validation and class-balanced-memory artifacts."""
+def save_artifacts(
+    output_dir,
+    run_config,
+    evaluation_split,
+    matrix,
+    history_rows,
+    summary_rows,
+    memory_rows,
+    memory_samples,
+):
+    """Write auditable task-boundary and class-balanced-memory artifacts."""
 
     with (output_dir / "run_config.json").open("w", encoding="utf-8") as file:
         json.dump(run_config, file, indent=2)
     with (output_dir / "accuracy_matrix.json").open("w", encoding="utf-8") as file:
-        json.dump({"split": "validation", "matrix": matrix}, file, indent=2)
+        json.dump({"split": evaluation_split, "matrix": matrix}, file, indent=2)
     write_csv(
         output_dir / "training_history.csv",
         history_rows,
@@ -237,7 +253,7 @@ def load_task_checkpoint(path, model, optimizer, device, run_config):
 
 
 def main():
-    """Run sequential class-balanced replay and validation-only CL measurement."""
+    """Run sequential class-balanced replay with fixed CL measurement."""
 
     args = parse_args()
     if args.memory_per_class < 1:
@@ -304,7 +320,8 @@ def main():
             train_transform,
             args,
         )
-        current_val_loader = create_validation_loader(
+        current_val_loader = create_evaluation_loader(
+            "val",
             task_id,
             args.image_root,
             eval_transform,
@@ -330,7 +347,8 @@ def main():
 
         task_accuracies = {}
         for evaluated_task_id in get_seen_task_ids(task_id, num_tasks):
-            validation_loader = create_validation_loader(
+            evaluation_loader = create_evaluation_loader(
+                args.evaluation_split,
                 evaluated_task_id,
                 args.image_root,
                 eval_transform,
@@ -338,7 +356,7 @@ def main():
             )
             task_accuracies[evaluated_task_id] = validate_one_epoch(
                 model,
-                validation_loader,
+                evaluation_loader,
                 device,
             )["top1"]
         record_accuracy_row(matrix, task_id, task_accuracies)
@@ -365,6 +383,7 @@ def main():
         save_artifacts(
             args.output_dir,
             run_config,
+            args.evaluation_split,
             matrix,
             history_rows,
             summary_rows,
@@ -385,7 +404,7 @@ def main():
         )
         print(json.dumps({**summary_rows[-1], **memory_rows[-1]}, sort_keys=True))
 
-    print(f"Validation-only replay outputs saved to: {args.output_dir}")
+    print(f"Task-boundary {args.evaluation_split} replay outputs saved to: {args.output_dir}")
 
 
 if __name__ == "__main__":

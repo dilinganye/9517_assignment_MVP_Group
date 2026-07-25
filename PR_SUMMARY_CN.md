@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #42 - Add held-out continual evaluation
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-heldout-evaluation`
+- PR 创建时间：2026-07-25 23:01:28 AEST
+- PR 合并时间：待合并
+- 摘要：为 no-replay 和 replay trainer 新增显式的 task-boundary evaluation split；默认仍使用 validation，配置冻结后可在独立输出目录写入 held-out test accuracy matrix。
+- 验证：manifest、continual-dataset、continual-metrics、no-replay 和 replay smoke test，两个 CLI help，合成 test-split artifact 检查，干净 Notebook JSON，以及 `git diff --check` 均通过。未提交原始图片、GPU 训练、checkpoint、预测文件或生成结果。
+
 ## PR #41 - Add inverse-frequency replay sampling
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-cl-balanced-sampling`
 - PR 创建时间：2026-07-25 22:26:35 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-25 22:29:01 AEST
 - 摘要：为 current-task 与 replay memory 合并后的训练集新增 opt-in 的 inverse-frequency 抽样；保留随机打乱的 M=2/M=5 baseline，并在 D Colab Notebook 中增加独立的、只使用 validation 的 M=5 follow-up 执行与对比单元。
 - 验证：replay、manifest、continual-dataset、continual-metrics 和 no-replay smoke test，weighted sampler/DataLoader 集成检查，replay 入口 help，干净 Notebook JSON，以及 `git diff --check` 均通过。未提交原始图片、GPU 训练、checkpoint、预测文件或生成结果。
 

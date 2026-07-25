@@ -19,8 +19,15 @@ def fail(message):
 def main():
     """Verify matching settings pass while a training change is rejected."""
 
-    config = {field: f"value-{field}" for field in NO_REPLAY_RESUME_FIELDS}
+    config = {
+        field: "val" if field == "evaluation_split" else f"value-{field}"
+        for field in NO_REPLAY_RESUME_FIELDS
+    }
     validate_no_replay_resume_config(config, config)
+
+    legacy_config = dict(config)
+    legacy_config.pop("evaluation_split")
+    validate_no_replay_resume_config(legacy_config, config)
 
     changed_config = dict(config)
     changed_config["learning_rate"] = "changed"
@@ -31,6 +38,16 @@ def main():
             fail("mismatch error does not identify the changed field")
     else:
         fail("mismatched resume configuration was accepted")
+
+    changed_split = dict(config)
+    changed_split["evaluation_split"] = "test"
+    try:
+        validate_no_replay_resume_config(config, changed_split)
+    except ValueError as error:
+        if "evaluation_split" not in str(error):
+            fail("mismatch error does not identify the evaluation split")
+    else:
+        fail("mismatched evaluation split was accepted")
 
     print("[continual-no-replay] PASS: resume configuration guard is consistent")
 

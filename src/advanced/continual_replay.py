@@ -70,6 +70,7 @@ def validate_replay_resume_config(saved_config, current_config):
 
     saved_config = dict(saved_config)
     saved_config.setdefault("class_balanced_sampling", False)
+    saved_config.setdefault("evaluation_split", "val")
 
     missing = [field for field in REPLAY_RESUME_FIELDS if field not in saved_config]
     mismatches = {

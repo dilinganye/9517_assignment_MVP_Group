@@ -42,12 +42,17 @@ def main():
         fail("inverse-frequency sampling does not balance class probability")
 
     config = {
-        field: False if field == "class_balanced_sampling" else f"value-{field}"
+        field: False
+        if field == "class_balanced_sampling"
+        else "val"
+        if field == "evaluation_split"
+        else f"value-{field}"
         for field in REPLAY_RESUME_FIELDS
     }
     validate_replay_resume_config(config, config)
     legacy_config = dict(config)
     legacy_config.pop("class_balanced_sampling")
+    legacy_config.pop("evaluation_split")
     validate_replay_resume_config(legacy_config, config)
     changed_config = dict(config)
     changed_config["memory_per_class"] = "changed"
@@ -58,6 +63,16 @@ def main():
             fail("mismatch error does not identify the replay memory setting")
     else:
         fail("mismatched replay memory setting was accepted")
+
+    changed_split = dict(config)
+    changed_split["evaluation_split"] = "test"
+    try:
+        validate_replay_resume_config(config, changed_split)
+    except ValueError as error:
+        if "evaluation_split" not in str(error):
+            fail("mismatch error does not identify the evaluation split")
+    else:
+        fail("mismatched evaluation split was accepted")
 
     print("[continual-replay] PASS: memory, sampling weights, and resume guard are consistent")
 

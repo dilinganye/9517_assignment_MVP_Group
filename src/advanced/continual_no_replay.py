@@ -6,6 +6,7 @@ NO_REPLAY_RESUME_FIELDS = (
     "batch_size",
     "classes_per_task",
     "continual_num_classes",
+    "evaluation_split",
     "epochs_per_task",
     "image_mean",
     "image_size",
@@ -26,6 +27,9 @@ def validate_no_replay_resume_config(saved_config, current_config):
 
     if not isinstance(saved_config, dict):
         raise ValueError("Checkpoint has no continual-learning run configuration")
+
+    saved_config = dict(saved_config)
+    saved_config.setdefault("evaluation_split", "val")
 
     missing = [field for field in NO_REPLAY_RESUME_FIELDS if field not in saved_config]
     mismatches = {

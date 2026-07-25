@@ -45,6 +45,12 @@ def parse_args():
     parser.add_argument("--learning-rate", type=float, default=0.01)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--train-augmentation", action="store_true")
+    parser.add_argument(
+        "--evaluation-split",
+        choices=("val", "test"),
+        default="val",
+        help="evaluate seen tasks at each task boundary on this held-out split",
+    )
     parser.add_argument("--resume", action="store_true")
     return parser.parse_args()
 
@@ -108,6 +114,7 @@ def create_run_config(args):
         "batch_size": args.batch_size,
         "classes_per_task": config.CONTINUAL_CLASSES_PER_TASK,
         "continual_num_classes": config.CONTINUAL_NUM_CLASSES,
+        "evaluation_split": args.evaluation_split,
         "epochs_per_task": args.epochs_per_task,
         "git_commit": get_git_commit(),
         "image_mean": config.IMG_MEAN,
@@ -156,13 +163,13 @@ def write_csv(path: Path, rows, fieldnames):
         writer.writerows(rows)
 
 
-def save_artifacts(output_dir: Path, run_config, matrix, history_rows, summary_rows):
-    """Write local, validation-only artifacts after a completed task."""
+def save_artifacts(output_dir: Path, run_config, evaluation_split, matrix, history_rows, summary_rows):
+    """Write local task-boundary artifacts after a completed task."""
 
     with (output_dir / "run_config.json").open("w", encoding="utf-8") as file:
         json.dump(run_config, file, indent=2)
     with (output_dir / "accuracy_matrix.json").open("w", encoding="utf-8") as file:
-        json.dump({"split": "validation", "matrix": matrix}, file, indent=2)
+        json.dump({"split": evaluation_split, "matrix": matrix}, file, indent=2)
     write_csv(
         output_dir / "training_history.csv",
         history_rows,
@@ -250,7 +257,7 @@ def create_loader(split, task_ids, image_root, transform, args, shuffle=False):
 
 
 def main():
-    """Run sequential task training and validation-only CL measurement."""
+    """Run sequential task training with fixed task-boundary CL measurement."""
 
     args = parse_args()
     if args.epochs_per_task < 1:
@@ -340,8 +347,8 @@ def main():
 
         task_accuracies = {}
         for evaluated_task_id in get_seen_task_ids(task_id, num_tasks):
-            validation_loader = create_loader(
-                "val",
+            evaluation_loader = create_loader(
+                args.evaluation_split,
                 evaluated_task_id,
                 args.image_root,
                 eval_transform,
@@ -349,14 +356,21 @@ def main():
             )
             task_accuracies[evaluated_task_id] = validate_one_epoch(
                 model,
-                validation_loader,
+                evaluation_loader,
                 device,
             )["top1"]
         record_accuracy_row(matrix, task_id, task_accuracies)
         summary_rows.append(summarize_after_task(matrix, task_id))
         run_config["completed_task_id"] = task_id
         run_config["epochs_completed"] = global_epoch
-        save_artifacts(args.output_dir, run_config, matrix, history_rows, summary_rows)
+        save_artifacts(
+            args.output_dir,
+            run_config,
+            args.evaluation_split,
+            matrix,
+            history_rows,
+            summary_rows,
+        )
         save_task_checkpoint(
             checkpoint_path,
             task_id,
@@ -369,7 +383,7 @@ def main():
         )
         print(json.dumps(summary_rows[-1], sort_keys=True))
 
-    print(f"Validation-only no-replay outputs saved to: {args.output_dir}")
+    print(f"Task-boundary {args.evaluation_split} no-replay outputs saved to: {args.output_dir}")
 
 
 if __name__ == "__main__":
