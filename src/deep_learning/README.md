@@ -8,5 +8,5 @@ latest checkpoint and rejects training-defining configuration mismatches.
 
 `Task_D_Colab_Execution.ipynb` documents the Colab execution workflow for the
 scratch baseline, augmentation comparison, held-out scratch evaluation, and
-the validation-only continual no-replay baseline. Generated Drive artifacts
-remain local and are not committed.
+the validation-only continual no-replay and replay baselines. Generated Drive
+artifacts remain local and are not committed.
