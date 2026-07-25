@@ -30,12 +30,21 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #42 - Add held-out continual evaluation
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-cl-heldout-evaluation`
+- PR created: 2026-07-25 23:01:28 AEST
+- PR merged: pending
+- Summary: add an explicit task-boundary evaluation split to the no-replay and replay trainers, preserving validation by default and enabling frozen configurations to write held-out test accuracy matrices in separate output directories.
+- Validation: manifest, continual-dataset, continual-metrics, no-replay, and replay smoke tests; both CLI help commands; synthetic test-split artifact checks; clean notebook JSON; and `git diff --check` passed. No raw images, GPU training, checkpoints, predictions, or generated results were committed.
+
 ## PR #41 - Add inverse-frequency replay sampling
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-cl-balanced-sampling`
 - PR created: 2026-07-25 22:26:35 AEST
-- PR merged: pending
+- PR merged: 2026-07-25 22:29:01 AEST
 - Summary: add opt-in inverse-frequency sampling for combined current-task and replay samples, preserving the random-shuffle M=2/M=5 baselines and documenting a separate validation-only M=5 follow-up in the D Colab notebook.
 - Validation: replay, manifest, continual-dataset, continual-metrics, and no-replay smoke tests; weighted sampler/DataLoader integration; replay-entry help; clean notebook JSON; and `git diff --check` passed. No raw images, GPU training, checkpoints, predictions, or generated results were committed.
 
