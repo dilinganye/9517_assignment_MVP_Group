@@ -8,6 +8,7 @@ from pathlib import Path
 
 import torch
 from torch import optim
+from torch.utils.data import WeightedRandomSampler
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -20,6 +21,7 @@ from src.advanced.continual_metrics import (
     summarize_after_task,
 )
 from src.advanced.continual_replay import (
+    inverse_frequency_sample_weights,
     update_class_balanced_memory,
     validate_class_balanced_memory,
     validate_replay_resume_config,
@@ -53,6 +55,11 @@ def parse_args():
     parser.add_argument("--learning-rate", type=float, default=0.01)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--train-augmentation", action="store_true")
+    parser.add_argument(
+        "--class-balanced-sampling",
+        action="store_true",
+        help="sample the combined current and replay dataset with equal class probability",
+    )
     parser.add_argument("--resume", action="store_true")
     return parser.parse_args()
 
@@ -63,6 +70,7 @@ def create_run_config(args):
     return {
         "approach": "class_balanced_replay",
         "batch_size": args.batch_size,
+        "class_balanced_sampling": args.class_balanced_sampling,
         "classes_per_task": config.CONTINUAL_CLASSES_PER_TASK,
         "continual_num_classes": config.CONTINUAL_NUM_CLASSES,
         "epochs_per_task": args.epochs_per_task,
@@ -96,13 +104,23 @@ def create_replay_train_loader(task_id, memory_samples, image_root, transform, a
     )
     current_samples = list(dataset.samples)
     dataset.samples = [*current_samples, *memory_samples]
+    sampler = None
+    shuffle = True
+    if args.class_balanced_sampling:
+        sampler = WeightedRandomSampler(
+            inverse_frequency_sample_weights(dataset.samples),
+            num_samples=len(dataset),
+            replacement=True,
+        )
+        shuffle = False
     return (
         create_dataloader(
             dataset,
             batch_size=args.batch_size,
-            shuffle=True,
+            shuffle=shuffle,
             num_workers=args.num_workers,
             pin_memory=True,
+            sampler=sampler,
         ),
         current_samples,
     )

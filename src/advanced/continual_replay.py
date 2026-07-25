@@ -5,7 +5,25 @@ import random
 from src.advanced.continual_no_replay import NO_REPLAY_RESUME_FIELDS
 
 
-REPLAY_RESUME_FIELDS = (*NO_REPLAY_RESUME_FIELDS, "memory_per_class")
+REPLAY_RESUME_FIELDS = (
+    *NO_REPLAY_RESUME_FIELDS,
+    "memory_per_class",
+    "class_balanced_sampling",
+)
+
+
+def inverse_frequency_sample_weights(samples):
+    """Return per-sample weights that give every observed class equal mass."""
+
+    if not samples:
+        raise ValueError("samples must not be empty")
+
+    counts = {}
+    for _, label in samples:
+        label = int(label)
+        counts[label] = counts.get(label, 0) + 1
+
+    return [1.0 / counts[int(label)] for _, label in samples]
 
 
 def update_class_balanced_memory(memory_samples, current_samples, memory_per_class: int, seed: int):
@@ -49,6 +67,9 @@ def validate_replay_resume_config(saved_config, current_config):
 
     if not isinstance(saved_config, dict):
         raise ValueError("Checkpoint has no continual-learning run configuration")
+
+    saved_config = dict(saved_config)
+    saved_config.setdefault("class_balanced_sampling", False)
 
     missing = [field for field in REPLAY_RESUME_FIELDS if field not in saved_config]
     mismatches = {

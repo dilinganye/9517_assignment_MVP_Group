@@ -30,12 +30,21 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #41 - Add inverse-frequency replay sampling
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-cl-balanced-sampling`
+- PR created: 2026-07-25 22:26:35 AEST
+- PR merged: pending
+- Summary: add opt-in inverse-frequency sampling for combined current-task and replay samples, preserving the random-shuffle M=2/M=5 baselines and documenting a separate validation-only M=5 follow-up in the D Colab notebook.
+- Validation: replay, manifest, continual-dataset, continual-metrics, and no-replay smoke tests; weighted sampler/DataLoader integration; replay-entry help; clean notebook JSON; and `git diff --check` passed. No raw images, GPU training, checkpoints, predictions, or generated results were committed.
+
 ## PR #40 - Add replay cells to D Colab notebook
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-d-colab-replay`
 - PR created: 2026-07-25 20:55:12 AEST
-- PR merged: pending
+- PR merged: 2026-07-25 21:30:08 AEST
 - Summary: add Colab execution, task-boundary resume, and validation-only comparison cells for the fixed M=2 and M=5 class-balanced replay experiments.
 - Validation: notebook JSON structure, 35 clean cells with no saved outputs, replay command paths against the merged trainer, and `git diff --check` passed. No data, model weights, predictions, or result figures were committed.
 
