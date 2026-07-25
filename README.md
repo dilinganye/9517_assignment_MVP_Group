@@ -228,7 +228,16 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_replay.py \
   --output-dir outputs/continual_100/final_test/replay_m5_inverse_frequency_v1
 ```
 
-ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. The next CL step after these validation comparisons is fixed-configuration held-out test evaluation.
+Create report tables and figures from those saved test artifacts without rerunning either model:
+
+```bash
+python scripts/summarize_continual_results.py \
+  --no-replay-dir outputs/continual_100/final_test/no_replay_v1 \
+  --replay-dir outputs/continual_100/final_test/replay_m5_inverse_frequency_v1 \
+  --output-dir outputs/continual_100/final_test/report_analysis
+```
+
+ImageNet-retention evaluation, complex replay selection, and 500-class continual learning are outside this initial scope. After validation comparisons, use the fixed-configuration held-out evaluation and offline report-artifact workflow above.
 
 ### 当前进度
 
@@ -307,7 +316,16 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train_continual_replay.py \
   --output-dir outputs/continual_100/final_test/replay_m5_inverse_frequency_v1
 ```
 
-ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。完成这些 validation 对比后的 CL 下一步是固定配置的 held-out test 评估。
+无需重新运行模型，即可从以上保存的 test artifacts 生成报告表格与图片：
+
+```bash
+python scripts/summarize_continual_results.py \
+  --no-replay-dir outputs/continual_100/final_test/no_replay_v1 \
+  --replay-dir outputs/continual_100/final_test/replay_m5_inverse_frequency_v1 \
+  --output-dir outputs/continual_100/final_test/report_analysis
+```
+
+ImageNet 保留能力评估、复杂 replay 选择策略和 500 类持续学习不属于初始范围。完成 validation 对比后，按上述固定配置的 held-out test 与离线报告产物流程执行。
 
 ## Collaboration Rules
 

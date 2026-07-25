@@ -30,12 +30,21 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #43 - Add continual result analysis
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-cl-result-analysis`
+- PR created: 2026-07-25 23:54:21 AEST
+- PR merged: pending
+- Summary: add an offline held-out continual-learning artifact summarizer that writes a final metrics table, old/seen/forgetting curves, and separate task-accuracy matrices for no-replay and inverse-frequency replay.
+- Validation: manifest, continual-dataset, continual-metrics, no-replay, replay, and result-analysis smoke tests; local synthetic PNG/CSV generation; clean notebook JSON; and `git diff --check` passed. No raw images, GPU training, checkpoints, predictions, or generated results were committed.
+
 ## PR #42 - Add held-out continual evaluation
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-cl-heldout-evaluation`
 - PR created: 2026-07-25 23:01:28 AEST
-- PR merged: pending
+- PR merged: 2026-07-25 23:03:33 AEST
 - Summary: add an explicit task-boundary evaluation split to the no-replay and replay trainers, preserving validation by default and enabling frozen configurations to write held-out test accuracy matrices in separate output directories.
 - Validation: manifest, continual-dataset, continual-metrics, no-replay, and replay smoke tests; both CLI help commands; synthetic test-split artifact checks; clean notebook JSON; and `git diff --check` passed. No raw images, GPU training, checkpoints, predictions, or generated results were committed.
 

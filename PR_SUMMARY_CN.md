@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #43 - Add continual result analysis
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-result-analysis`
+- PR 创建时间：2026-07-25 23:54:21 AEST
+- PR 合并时间：待合并
+- 摘要：新增离线 held-out CL artifact 汇总脚本，输出最终指标表、old/seen/forgetting 曲线，以及 no-replay 和 inverse-frequency replay 各自的 task-accuracy matrix 图。
+- 验证：manifest、continual-dataset、continual-metrics、no-replay、replay 和 result-analysis smoke test，本地合成 PNG/CSV 生成，干净 Notebook JSON，以及 `git diff --check` 均通过。未提交原始图片、GPU 训练、checkpoint、预测文件或生成结果。
+
 ## PR #42 - Add held-out continual evaluation
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-cl-heldout-evaluation`
 - PR 创建时间：2026-07-25 23:01:28 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-25 23:03:33 AEST
 - 摘要：为 no-replay 和 replay trainer 新增显式的 task-boundary evaluation split；默认仍使用 validation，配置冻结后可在独立输出目录写入 held-out test accuracy matrix。
 - 验证：manifest、continual-dataset、continual-metrics、no-replay 和 replay smoke test，两个 CLI help，合成 test-split artifact 检查，干净 Notebook JSON，以及 `git diff --check` 均通过。未提交原始图片、GPU 训练、checkpoint、预测文件或生成结果。
 
