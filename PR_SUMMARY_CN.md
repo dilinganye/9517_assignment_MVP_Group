@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #41 - Add inverse-frequency replay sampling
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-balanced-sampling`
+- PR 创建时间：2026-07-25 22:26:35 AEST
+- PR 合并时间：待合并
+- 摘要：为 current-task 与 replay memory 合并后的训练集新增 opt-in 的 inverse-frequency 抽样；保留随机打乱的 M=2/M=5 baseline，并在 D Colab Notebook 中增加独立的、只使用 validation 的 M=5 follow-up 执行与对比单元。
+- 验证：replay、manifest、continual-dataset、continual-metrics 和 no-replay smoke test，weighted sampler/DataLoader 集成检查，replay 入口 help，干净 Notebook JSON，以及 `git diff --check` 均通过。未提交原始图片、GPU 训练、checkpoint、预测文件或生成结果。
+
 ## PR #40 - Add replay cells to D Colab notebook
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-d-colab-replay`
 - PR 创建时间：2026-07-25 20:55:12 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-25 21:30:08 AEST
 - 摘要：在 D Colab Notebook 中新增固定 M=2、M=5 class-balanced replay 的执行、task 边界 resume 和 validation-only 对比单元。
 - 验证：Notebook JSON 结构、35 个无保存输出的单元、与已合并 replay trainer 的命令路径核对，以及 `git diff --check` 均通过。未提交数据、模型权重、预测文件或结果图。
 
