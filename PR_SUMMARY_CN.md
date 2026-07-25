@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #39 - Add continual replay trainer
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-cl-replay`
+- PR 创建时间：2026-07-25 20:32:22 AEST
+- PR 合并时间：待合并
+- 摘要：新增确定性的 class-balanced replay memory 和 CUDA scratch replay trainer；训练每个 task 时混合当前 task 与每个旧类的 M 张记忆样本，保存 validation 指标、memory manifest 与 task 边界恢复状态。
+- 验证：Python compile-all、共享 manifest smoke test、持续学习任务计划、数据适配器、指标、no-replay 和 replay-memory smoke test、replay 入口 help、当前 task 加旧类 memory 的数据集检查，以及 CPU replay checkpoint 往返均通过。未运行原始图片、GPU 训练、replay 结果或 test 评估。
+
 ## PR #38 - Add D Colab execution notebook
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-d-colab-execution`
 - PR 创建时间：2026-07-25 20:19:04 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-25 20:21:25 AEST
 - 摘要：新增干净的 D 部分 Colab 执行 Notebook，记录 scratch smoke、baseline、augmentation、held-out test、离线错误分析和 CL no-replay 的完整执行流程；原始数据和 Drive 生成产物不进入 Git。
 - 验证：Notebook JSON 结构、29 个无保存输出的单元、对现有 D 脚本命令路径的核对，以及 `git diff --check` 均通过。未提交数据、模型权重、预测文件或结果图。
 
