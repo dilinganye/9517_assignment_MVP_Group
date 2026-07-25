@@ -21,7 +21,7 @@ jobs:
 
       - name: Compile lightweight Python modules
         run: |
-          python -m py_compile scripts/smoke_test.py scripts/smoke_continual_task_dataset.py scripts/smoke_continual_metrics.py scripts/smoke_continual_no_replay.py scripts/smoke_continual_replay.py scripts/summarize_data_manifests.py scripts/train_scratch_resnet18.py scripts/evaluate_scratch_resnet18.py scripts/analyze_scratch_evaluation.py scripts/create_continual_task_plan.py src/config.py src/evaluation.py src/advanced/continual_learning.py src/advanced/continual_metrics.py src/advanced/continual_no_replay.py src/advanced/continual_replay.py src/data/dataset.py src/deep_learning/checkpoint.py src/deep_learning/trainer.py src/deep_learning/scratch_resnet18.py
+          python -m py_compile scripts/smoke_test.py scripts/smoke_continual_task_dataset.py scripts/smoke_continual_metrics.py scripts/smoke_continual_no_replay.py scripts/smoke_continual_replay.py scripts/smoke_continual_result_analysis.py scripts/summarize_data_manifests.py scripts/summarize_continual_results.py scripts/train_scratch_resnet18.py scripts/evaluate_scratch_resnet18.py scripts/analyze_scratch_evaluation.py scripts/create_continual_task_plan.py src/config.py src/evaluation.py src/advanced/continual_learning.py src/advanced/continual_metrics.py src/advanced/continual_no_replay.py src/advanced/continual_replay.py src/data/dataset.py src/deep_learning/checkpoint.py src/deep_learning/trainer.py src/deep_learning/scratch_resnet18.py
 
       - name: Run manifest smoke test
         run: |
@@ -50,3 +50,7 @@ jobs:
       - name: Verify continual replay memory
         run: |
           python scripts/smoke_continual_replay.py
+
+      - name: Verify continual result analysis
+        run: |
+          python scripts/smoke_continual_result_analysis.py
