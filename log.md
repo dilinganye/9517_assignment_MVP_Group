@@ -30,12 +30,21 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #44 - Add scratch Grad-CAM evidence
+
+- Author: xuanzhougu
+- Branch: `xuanzhou-scratch-gradcam`
+- PR created: 2026-07-26 21:46:42 AEST
+- PR merged: pending
+- Summary: add a compact Grad-CAM evidence generator for the frozen scratch augmentation checkpoint. It reuses saved held-out predictions and existing frequent confusion pairs, validates the checkpoint reproduces each selected prediction, and writes correct, incorrect, and confused-pair figures plus an auditable CSV outside Git.
+- Validation: full CI-equivalent manifest, continual-learning, and result-analysis smoke suite; dependency-light Grad-CAM selection smoke test; Python compilation; clean notebook JSON; and `git diff --check` passed. No raw images, checkpoints, predictions, or generated figures were committed.
+
 ## PR #43 - Add continual result analysis
 
 - Author: xuanzhougu
 - Branch: `xuanzhou-cl-result-analysis`
 - PR created: 2026-07-25 23:54:21 AEST
-- PR merged: pending
+- PR merged: 2026-07-25 23:56:28 AEST
 - Summary: add an offline held-out continual-learning artifact summarizer that writes a final metrics table, old/seen/forgetting curves, and separate task-accuracy matrices for no-replay and inverse-frequency replay.
 - Validation: manifest, continual-dataset, continual-metrics, no-replay, replay, and result-analysis smoke tests; local synthetic PNG/CSV generation; clean notebook JSON; and `git diff --check` passed. No raw images, GPU training, checkpoints, predictions, or generated results were committed.
 

@@ -225,12 +225,21 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 
 ## Scratch CNN 起始 PR 记录
 
+## PR #44 - Add scratch Grad-CAM evidence
+
+- 作者：xuanzhougu
+- 分支：`xuanzhou-scratch-gradcam`
+- PR 创建时间：2026-07-26 21:46:42 AEST
+- PR 合并时间：待合并
+- 摘要：为已冻结的 scratch augmentation checkpoint 新增一套小型 Grad-CAM 证据生成流程。它复用已保存的 held-out prediction 与高频混淆对，校验 checkpoint 可复现每个选中样本的预测，并在 Git 之外输出正确、错误和混淆物种对图以及可审计 CSV。
+- 验证：完整 CI 等价的 manifest、持续学习和 result-analysis smoke suite，零深度学习依赖的 Grad-CAM 选样 smoke test、Python 语法编译、干净 Notebook JSON 和 `git diff --check` 均通过。未提交原始图片、checkpoint、预测文件或生成图。
+
 ## PR #43 - Add continual result analysis
 
 - 作者：xuanzhougu
 - 分支：`xuanzhou-cl-result-analysis`
 - PR 创建时间：2026-07-25 23:54:21 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-25 23:56:28 AEST
 - 摘要：新增离线 held-out CL artifact 汇总脚本，输出最终指标表、old/seen/forgetting 曲线，以及 no-replay 和 inverse-frequency replay 各自的 task-accuracy matrix 图。
 - 验证：manifest、continual-dataset、continual-metrics、no-replay、replay 和 result-analysis smoke test，本地合成 PNG/CSV 生成，干净 Notebook JSON，以及 `git diff --check` 均通过。未提交原始图片、GPU 训练、checkpoint、预测文件或生成结果。
 
