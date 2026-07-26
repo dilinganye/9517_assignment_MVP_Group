@@ -76,6 +76,19 @@ pairs, and a readable confusion plot for the lowest-recall classes. The shared
 `src.evaluation.evaluate_class_scores` helper defines the common Top-1, Top-5,
 overall accuracy, macro precision, macro recall, and macro F1 fields.
 
+Generate a compact Grad-CAM evidence set from this frozen scratch test result.
+It reuses the existing prediction and confused-pair artifacts, runs only on the
+selected images, and writes figures plus an auditable summary outside Git:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/generate_scratch_gradcam.py \
+  --checkpoint /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/augmentation_v1/best_checkpoint.pt \
+  --image-root /content/inat_data_fresh \
+  --predictions /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/predictions.csv \
+  --confused-pairs /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/most_confused_pairs.csv \
+  --output-dir /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/gradcam_results
+```
+
 先根据验证集选择模型，再只在保留的 test 集上运行一次最终评估。上面的 Colab
 命令使用带增强的 scratch ResNet18 候选模型。它会写入 `metrics.json`、
 `evaluation_config.json`、逐图片的 `predictions.csv`，以及 CSV 和 PNG 格式的完整
@@ -89,6 +102,18 @@ python scripts/analyze_scratch_evaluation.py \
 该脚本会写入每类 precision/recall/F1、最常见物种混淆对，以及针对 recall 最低类别的可读混淆图。共享的
 `src.evaluation.evaluate_class_scores` 规定 Top-1、Top-5、overall accuracy、macro
 precision、macro recall 和 macro F1 字段。
+
+基于已冻结的 scratch test 结果生成一组小型 Grad-CAM 证据。它只复用既有的预测和混淆对产物，
+仅对选中的图片前向计算，并将图和可审计汇总写在 Git 之外：
+
+```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/generate_scratch_gradcam.py \
+  --checkpoint /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/augmentation_v1/best_checkpoint.pt \
+  --image-root /content/inat_data_fresh \
+  --predictions /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/predictions.csv \
+  --confused-pairs /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/most_confused_pairs.csv \
+  --output-dir /content/drive/MyDrive/COMP9517/outputs/scratch_resnet18/final_evaluation/gradcam_results
+```
 
 ## Data Processing Notes
 
