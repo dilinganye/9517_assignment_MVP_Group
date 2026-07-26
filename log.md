@@ -35,7 +35,7 @@ When this file is updated, use this format:
 - Author: xuanzhougu
 - Branch: `xuanzhou-scratch-gradcam`
 - PR created: 2026-07-26 21:46:42 AEST
-- PR merged: pending
+- PR merged: 2026-07-26 21:50:12 AEST
 - Summary: add a compact Grad-CAM evidence generator for the frozen scratch augmentation checkpoint. It reuses saved held-out predictions and existing frequent confusion pairs, validates the checkpoint reproduces each selected prediction, and writes correct, incorrect, and confused-pair figures plus an auditable CSV outside Git.
 - Validation: full CI-equivalent manifest, continual-learning, and result-analysis smoke suite; dependency-light Grad-CAM selection smoke test; Python compilation; clean notebook JSON; and `git diff --check` passed. No raw images, checkpoints, predictions, or generated figures were committed.
 
