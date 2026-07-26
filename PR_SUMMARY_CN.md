@@ -230,7 +230,7 @@ CI 不安装训练依赖、不下载图片、不跑模型训练、不做完整�
 - 作者：xuanzhougu
 - 分支：`xuanzhou-scratch-gradcam`
 - PR 创建时间：2026-07-26 21:46:42 AEST
-- PR 合并时间：待合并
+- PR 合并时间：2026-07-26 21:50:12 AEST
 - 摘要：为已冻结的 scratch augmentation checkpoint 新增一套小型 Grad-CAM 证据生成流程。它复用已保存的 held-out prediction 与高频混淆对，校验 checkpoint 可复现每个选中样本的预测，并在 Git 之外输出正确、错误和混淆物种对图以及可审计 CSV。
 - 验证：完整 CI 等价的 manifest、持续学习和 result-analysis smoke suite，零深度学习依赖的 Grad-CAM 选样 smoke test、Python 语法编译、干净 Notebook JSON 和 `git diff --check` 均通过。未提交原始图片、checkpoint、预测文件或生成图。
 

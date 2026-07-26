@@ -181,17 +181,18 @@ Committed data manifests live in `data/processed/`.
 - The shared 500-class manifests, Dataset/DataLoader entry points, manifest checks, and lightweight CI are in place.
 - Traditional HOG and colour-histogram features, plus Linear SVM and Random Forest classifier baselines, are available. The final report must document SVM selection from validation results only; the current notebook commentary should not use test-set comparisons to justify a hyperparameter choice.
 - The scratch-CNN path now includes a randomly initialized ResNet18 factory, epoch-level trainer, loss and Top-1 history, training-time recording, curve plotting, best/last checkpoints with resume guards, and final test evaluation. The completed augmentation run reached validation Top-1 0.2458 at epoch 19 and held-out test Top-1 0.2440. Its Colab Tesla T4 cell showed approximately 46 minutes of wall-clock time; this is a manually observed historical record, while future runs write per-epoch and total timing automatically.
-- The pretrained-CNN path has a ResNet18 training and ablation notebook with a small end-to-end validation run. Full 500-class results and final evaluation remain outstanding.
+- The pretrained-CNN path completed its 500-class ResNet18 training, ablations, and held-out evaluation. The main model reached validation Top-1 0.6310 and test Top-1 0.6390; its Grad-CAM analysis covers correct predictions, incorrect predictions, and frequent confused species pairs.
+- The 100-class continual-learning study completed fixed-configuration held-out no-replay and class-balanced replay comparisons, offline result figures, and an E04 extended comparison notebook. These advanced experiments remain separate from the required 500-class baselines.
 
-### Known Gaps and Report Guardrails
+### Delivery Notes and Report Guardrails
 
-- The pretrained 500-class baseline, its held-out test evaluation, and Grad-CAM remain incomplete. CL task setup may proceed in parallel, but full CL training must not delay these required baseline deliverables.
-- `src.evaluation.evaluate_class_scores` is used by scratch evaluation. Traditional and pretrained routes must emit the same metric fields and comparable final artifacts before the final result table is assembled.
+- The pretrained 500-class baseline, held-out test evaluation, and Grad-CAM are complete. Keep the resulting local artifacts available to the group for the report and video; they remain intentionally outside Git.
+- `src.evaluation.evaluate_class_scores` defines the common scratch and continual-learning metric fields. Traditional and pretrained final artifacts record comparable Top-1, Top-5, macro precision, macro recall, and macro F1 values for report assembly.
 - The lightweight CI checks syntax and manifests only. A separate dependency-installed synthetic deep-learning/evaluation smoke job remains a follow-up, not a full training job.
 
 ### Continual Learning: Next-Stage Plan
 
-Based on course discussion in July 2026, scratch-only class-incremental continual learning is the next D-owned advanced direction. The current setup fixes a deterministic 100-class subset and 10 tasks, exposes a task dataset adapter and metric contract, and provides a sequential no-replay trainer; it does not replace the required baseline methods.
+Based on course discussion in July 2026, the D-owned scratch class-incremental continual-learning direction fixes a deterministic 100-class subset and 10 tasks. It now includes the shared task dataset adapter, no-replay and class-balanced replay trainers, held-out evaluation, and offline report artifacts; it does not replace the required baseline methods.
 
 - `data/processed/continual_100/class_tasks_100.csv` records the selected source labels, fixed 0-99 continual labels, task-local labels, and species metadata. `src.data.create_continual_dataset(split, task_ids)` filters the existing shared manifests using this compact map rather than duplicating image lists.
 - Use a fixed 100-class scratch ResNet18 head and class-incremental evaluation over all seen classes, without providing a task ID at inference.
@@ -269,17 +270,18 @@ ImageNet-retention evaluation, complex replay selection, and 500-class continual
 - 已具备共享的 500 类数据清单、Dataset/DataLoader 入口、manifest 检查和轻量 CI。
 - 传统 HOG 与颜色直方图特征、Linear SVM 和 Random Forest 分类 baseline 已具备。最终报告必须只用验证集说明 SVM 选择；当前 notebook 的说明不应再以 test 集比较来支撑超参数取舍。
 - Scratch CNN 已具备随机初始化 ResNet18、按 epoch 的 trainer、loss 和 Top-1 history、训练耗时记录、曲线绘图、best/last checkpoint 与 resume guard，以及最终 test 评估。已完成的 augmentation run 在第 19 个 epoch 达到 validation Top-1 0.2458，并取得 held-out test Top-1 0.2440。Colab Tesla T4 cell 显示约 46 分钟 wall-clock time；这是手动观察到的历史记录，后续运行会自动保存每个 epoch 和总训练耗时。
-- Pretrained CNN 已具备 ResNet18 训练和消融 Notebook，并完成小规模端到端流程验证；完整 500 类结果和最终评估仍未完成。
+- Pretrained CNN 已完成 500 类 ResNet18 训练、消融和 held-out 评估。主模型的 validation Top-1 为 0.6310、test Top-1 为 0.6390；Grad-CAM 已覆盖正确预测、错误预测和高频混淆物种对。
+- 100 类持续学习研究已完成固定配置的 held-out no-replay 与 class-balanced replay 对比、离线结果图，以及 E04 扩展对比 Notebook。这些 advanced 实验仍与必做的 500 类 baseline 分开。
 
-### 已知缺口与报告约束
+### 交付说明与报告约束
 
-- pretrained 500 类 baseline、其 held-out test 评估和 Grad-CAM 尚未完成。CL 的任务计划可以并行准备，但完整 CL 训练不得延误这些必做 baseline。
-- `src.evaluation.evaluate_class_scores` 目前由 scratch 评估使用。传统和 pretrained 路线在最终结果表汇总前，必须输出相同指标字段和可比较的最终产物。
+- pretrained 500 类 baseline、held-out test 评估和 Grad-CAM 已完成。请让小组持续保留对应的本地实验产物，供报告和视频使用；它们仍按约定不提交 Git。
+- `src.evaluation.evaluate_class_scores` 规定 scratch 和持续学习共享的指标字段。传统和 pretrained 最终产物也记录了可用于报告汇总的 Top-1、Top-5、macro precision、macro recall 和 macro F1。
 - 轻量 CI 只检查语法和 manifest。一项安装依赖的合成 deep-learning/evaluation smoke job 仍是后续工作，但不应在 CI 中加入完整训练。
 
 ### 持续学习：下一阶段计划
 
-根据 2026 年 7 月的课程沟通，基于 scratch 的小规模 class-incremental continual learning 是 D 的下一阶段 advanced direction。当前已固定可复现的 100 类子集、10 个任务，提供 task dataset adapter、指标契约和 sequential no-replay trainer；它不替代必做 baseline。
+根据 2026 年 7 月的课程沟通，D 负责的 scratch class-incremental continual learning 固定使用可复现的 100 类子集和 10 个任务。当前已具备共享 task dataset adapter、no-replay 与 class-balanced replay trainer、held-out 评估和离线报告产物；它不替代必做 baseline。
 
 - `data/processed/continual_100/class_tasks_100.csv` 记录被选中的 source label、固定的 0-99 continual label、任务内标签和物种元信息。`src.data.create_continual_dataset(split, task_ids)` 会用这份紧凑映射过滤既有共享 manifest，而不复制图片路径清单。
 - 使用固定 100 类输出头的 scratch ResNet18，在推理时不提供 task ID，并对所有已见类别进行 class-incremental 评估。
