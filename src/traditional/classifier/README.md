@@ -28,6 +28,44 @@ Pipeline:
 - A nearest-centroid classifier evaluated as a trivial, hyperparameter-free
   baseline for reference.
 
+**Results** (test set, 500 classes, 40 train / 10 val / 10 test images per
+class). All three rows are evaluated on the same held-out test set:
+
+| Model | Top-1 | Top-5 | Macro F1 | Train time |
+| --- | --- | --- | --- | --- |
+| Nearest-centroid (baseline) | 2.24% | 7.26% | – | – |
+| Linear SVM (PCA + `C=1.0`) | 2.42% | 7.54% | 0.018 | ~98s |
+| Random Forest | 3.32% | 10.04% | 0.020 | ~398s |
+
+Both classifiers exceed the trivial baseline, but by very different margins:
+the Linear SVM only marginally beats it (+0.18pp top-1, +0.28pp top-5),
+while Random Forest beats it convincingly (+1.08pp top-1, +2.78pp top-5),
+suggesting a non-linear decision boundary extracts more useful structure
+from the same features than a linear one can. See the report for discussion.
+
+Note: an earlier version of this table used a baseline computed on the
+*validation* set (2.84%/8.24%) instead of the test set, which understated
+how close the Linear SVM actually is to trivial performance. The table
+above is the corrected, test-set-only comparison.
+
+A descriptor ablation (nearest-centroid, validation set) isolates each
+feature's own contribution:
+
+| Descriptor | Dimensions | Top-1 | Top-5 |
+| --- | --- | --- | --- |
+| HOG only | 6084 | 2.66% | 7.46% |
+| Colour histogram only | 96 | 1.38% | 5.42% |
+| Combined (HOG + colour) | 6180 | 2.92% | 8.06% |
+
+HOG carries most of the signal; the colour histogram alone is weak, but
+combining the two still helps slightly over HOG alone.
+
+Random Forest's own confusion matrix, hardest-class breakdown, and
+most-confused species pairs are also reported (alongside the Linear SVM's),
+and a sample of misclassified test images is visualised for qualitative
+failure analysis. All outputs are saved under
+`outputs/traditional_classifier/`.
+
 ### `sift_bovw_classifier.ipynb`
 
 Developed on `Hengyi_TraditionalClassifier3`.
@@ -112,46 +150,3 @@ cache on a fresh clone, regenerate it by running `../features/features.ipynb`
 and `../features/cache.ipynb`, or download the pre-computed feature files from
 the OneDrive link in `cache.ipynb` and place them under
 `outputs/traditional_features/`.
-
-## Results
-
-Test-set results (500 classes, 40 train / 10 val / 10 test images per class).
-All three rows are evaluated on the same held-out test set:
-
-| Model | Top-1 | Top-5 | Macro F1 | Train time |
-| --- | --- | --- | --- | --- |
-| Nearest-centroid (baseline) | 2.24% | 7.26% | – | – |
-| Linear SVM (PCA + `C=1.0`) | 2.42% | 7.54% | 0.018 | ~98s |
-| Random Forest | 3.32% | 10.04% | 0.020 | ~398s |
-
-Both classifiers exceed the trivial baseline, but by very different margins:
-the Linear SVM only marginally beats it (+0.18pp top-1, +0.28pp top-5),
-while Random Forest beats it convincingly (+1.08pp top-1, +2.78pp top-5),
-suggesting a non-linear decision boundary extracts more useful structure
-from the same features than a linear one can. See the report for discussion.
-
-Note: an earlier version of this table used a baseline computed on the
-*validation* set (2.84%/8.24%) instead of the test set, which understated
-how close the Linear SVM actually is to trivial performance. The table
-above is the corrected, test-set-only comparison.
-
-A descriptor ablation (nearest-centroid, validation set) isolates each
-feature's own contribution:
-
-| Descriptor | Dimensions | Top-1 | Top-5 |
-| --- | --- | --- | --- |
-| HOG only | 6084 | 2.66% | 7.46% |
-| Colour histogram only | 96 | 1.38% | 5.42% |
-| Combined (HOG + colour) | 6180 | 2.92% | 8.06% |
-
-HOG carries most of the signal; the colour histogram alone is weak, but
-combining the two still helps slightly over HOG alone.
-
-Random Forest's own confusion matrix, hardest-class breakdown, and
-most-confused species pairs are also reported (alongside the Linear SVM's),
-and a sample of misclassified test images is visualised for qualitative
-failure analysis.
-
-All outputs (metrics, confusion matrices, most-confused species pairs,
-misclassified test images, and the fitted models) are saved under
-`outputs/traditional_classifier/`.
