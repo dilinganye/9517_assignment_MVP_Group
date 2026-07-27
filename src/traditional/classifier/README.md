@@ -93,6 +93,7 @@ Pipeline:
 
 Outputs are saved under `outputs/sift_bovw_classifier/`.
 
+
 **Results** (test set, 500 classes, 5,000 test images):
 
 | Model | Top-1 | Top-5 | Macro F1 |
