@@ -15,6 +15,8 @@
   <a href="#delivered-work">Delivered Work</a> &bull;
   <a href="#project-architecture">Architecture</a> &bull;
   <a href="#evaluation-snapshot">Evaluation Snapshot</a> &bull;
+  <a href="#team-contributions">Team</a> &bull;
+  <a href="#references">References</a> &bull;
   <a href="#reproducibility">Reproducibility</a>
 </p>
 
@@ -30,9 +32,9 @@ This repository contains the completed COMP9517 group project for fine-grained i
 | --- | --- |
 | **Data and infrastructure** | Deterministic 500-class manifests, shared label metadata, Dataset/DataLoader utilities, manifest checks, and lightweight GitHub Actions validation. |
 | **Traditional vision** | HOG, colour-histogram, and SIFT Bag-of-Visual-Words features; nearest-centroid, Linear SVM, and Random Forest classifiers; held-out evaluation and error analysis. |
-| **Scratch CNN** | Randomly initialized ResNet18, training/validation loops, loss and Top-1 curves, checkpointing, guarded resume support, held-out evaluation, and error analysis. |
+| **Scratch CNN** | Randomly initialized ResNet18, training/validation loops, loss and Top-1 curves, checkpointing, guarded resume support, held-out evaluation, error analysis, and Grad-CAM evidence. |
 | **Pretrained CNN** | ImageNet-pretrained ResNet18 training, ablations, checkpoint recovery, held-out evaluation, and Grad-CAM evidence. |
-| **Advanced study** | Fixed 100-class / 10-task continual-learning protocol, sequential no-replay and replay baselines, class-balanced sampling, task-accuracy matrices, forgetting metrics, and offline comparison figures. |
+| **Advanced study** | Fixed 100-class / 10-task continual-learning protocol on both CNN routes, sequential no-replay and replay baselines, class-balanced sampling, task-accuracy matrices, forgetting metrics, and offline comparison figures. |
 
 ## Dataset Protocol
 
@@ -54,20 +56,34 @@ flowchart TB
     Manifests --> DataLayer["Shared data layer<br/>config + Dataset + DataLoader"]
     TaskMap["100-class continual task map"] --> DataLayer
 
-    DataLayer --> Traditional["Traditional vision<br/>HOG / colour / SIFT-BoVW<br/>SVM / Random Forest"]
-    DataLayer --> Scratch["Scratch CNN<br/>random ResNet18<br/>trainer + checkpoints"]
-    DataLayer --> Pretrained["Pretrained CNN<br/>ResNet18 training<br/>and ablations"]
-    Scratch --> CL["Continual learning<br/>no replay / replay<br/>task metrics"]
+    subgraph Baselines["500-class classification routes"]
+        direction LR
+        Traditional["Traditional vision<br/>HOG / colour / SIFT-BoVW<br/>SVM / Random Forest"]
+        Scratch["Scratch CNN<br/>random ResNet18<br/>trainer + checkpoints"]
+        Pretrained["Pretrained CNN<br/>ResNet18 training<br/>and ablations"]
+    end
 
-    Traditional --> Evaluation["Shared evaluation<br/>Top-1 / Top-5 / macro metrics<br/>predictions + confusion artifacts"]
-    Scratch --> Evaluation
-    Pretrained --> Evaluation
-    CL --> CLResults["Accuracy matrices<br/>forgetting curves<br/>offline summaries"]
-    Evaluation --> Explainability["Grad-CAM and error analysis"]
+    DataLayer --> Traditional
+    DataLayer --> Scratch
+    DataLayer --> Pretrained
+
+    Traditional --> TraditionalEval["Traditional evaluation<br/>metrics + confusion analysis"]
+    Scratch --> CNNEval["CNN evaluation<br/>metrics + predictions<br/>confusion artifacts"]
+    Pretrained --> CNNEval
+
+    Scratch --> ScratchCAM["Scratch Grad-CAM<br/>correct / incorrect<br/>confused-pair evidence"]
+    Pretrained --> PretrainedCAM["Pretrained Grad-CAM<br/>correct / incorrect<br/>confused-pair evidence"]
+
+    Scratch --> ScratchCL["Scratch continual learning<br/>no replay + replay"]
+    Pretrained --> PretrainedCL["Pretrained continual learning<br/>E04 comparison"]
+    ScratchCL --> CLResults["100-class task matrices<br/>old / seen accuracy<br/>average forgetting"]
+    PretrainedCL --> CLResults
 
     CI["GitHub Actions<br/>syntax + manifest smoke checks"] --> Manifests
     CI --> DataLayer
 ```
+
+Grad-CAM is a CNN-only analysis: it is implemented for both the scratch and pretrained ResNet18 routes, not for the handcrafted traditional pipeline. The continual-learning study also has one branch for each CNN route; it uses the same 100-class task map and reports their task-boundary metrics separately.
 
 ## Evaluation Snapshot
 
@@ -90,7 +106,7 @@ The advanced experiment uses a deterministic 100-class subset split into 10 sequ
 | Sequential fine-tuning without replay | 16.00% | 0.00% | 1.60% | 0.2600 |
 | Replay, 5 images per old class, class-balanced sampling | 28.00% | 1.89% | 4.50% | 0.3322 |
 
-This study is reported separately from the required 500-class baselines. Its saved artifacts include task-by-task accuracy matrices, current/old/seen accuracy curves, average-forgetting curves, replay-memory summaries, and final metric tables.
+This study is reported separately from the required 500-class baselines. The held-out values above are from the scratch branch; the pretrained E04 branch uses the same task map and writes its own task matrices and comparison outputs. The saved artifacts include task-by-task accuracy matrices, current/old/seen accuracy curves, average-forgetting curves, replay-memory summaries, and final metric tables.
 
 ## Repository Layout
 
@@ -112,6 +128,24 @@ This study is reported separately from the required 500-class baselines. Its sav
 |-- requirements.txt
 `-- log.md                   # Project maintenance record
 ```
+
+## Team Contributions
+
+| Section | Member | Completed responsibilities |
+| --- | --- | --- |
+| A | Wang Haozhe | Data selection, preprocessing, and shared dataset manifests. |
+| B | Liu Chaohao | Handcrafted feature extraction and traditional-method development. |
+| C | Xu Hengyi | Classical classifiers, SIFT-BoVW experiments, and traditional-method evaluation. |
+| D | Gu Xuanzhou | Scratch ResNet18, training/checkpoint infrastructure, scratch Grad-CAM, and continual-learning baselines. |
+| E | Lin Guohao | Pretrained ResNet18, ablations, pretrained Grad-CAM, and extended continual-learning comparisons. |
+
+## References
+
+1. Grant Van Horn, Elijah Cole, Sara Beery, Kimberly Wilber, Serge Belongie, and Oisin Mac Aodha. [Benchmarking Representation Learning for Natural World Image Collections](https://openaccess.thecvf.com/content/CVPR2021/html/Van_Horn_Benchmarking_Representation_Learning_for_Natural_World_Image_Collections_CVPR_2021_paper.html). CVPR, 2021.
+2. Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. [Deep Residual Learning for Image Recognition](https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html). CVPR, 2016.
+3. Ramprasaath R. Selvaraju et al. [Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization](https://doi.org/10.1109/ICCV.2017.74). ICCV, 2017.
+4. Matthias De Lange et al. [A Continual Learning Survey: Defying Forgetting in Classification Tasks](https://doi.org/10.1109/TPAMI.2021.3057446). IEEE TPAMI, 2022.
+5. Arslan Chaudhry et al. [On Tiny Episodic Memories in Continual Learning](https://arxiv.org/abs/1902.10486). arXiv:1902.10486, 2019.
 
 ## Reproducibility
 
