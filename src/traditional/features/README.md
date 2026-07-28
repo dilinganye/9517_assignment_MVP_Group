@@ -1,7 +1,6 @@
 # Traditional Feature Extraction
 
 This folder contains the traditional feature extraction work for the project.
-There is shared link of the 
 
 ## Current Files
 
@@ -242,14 +241,14 @@ The raw image files are not committed to Git.
 
 ## Validation
 
-| Feature | Shape | Data type |
-| --- | --- | --- |
+| Feature | Shape | Data type | Output length |
+| --- | --- | --- | --- |
 | HOG | `(6084,)` | `float32` | Fixed |
 | RGB colour histogram | `(96,)` | `float32` | Fixed |
 | Combined HOG and colour | `(6180,)` | `float32` | Fixed |
 | SIFT descriptors | `(N, 128)` | `float32` | Variable |
 
-Both methods were tested on images from different classes and produced fixed-length feature vectors.
+The HOG, colour, and combined features produced fixed-length vectors. SIFT produced a variable number of 128-dimensional descriptors.
 
 ## Downloading Traditional Feature Files
 
@@ -299,6 +298,6 @@ When adding a new feature:
 
 - use the shared settings from `config.py`
 - accept a PIL image as input
-- return a one-dimensional `float32` NumPy array
-- keep the output length fixed
+- return `float32` NumPy arrays
+- clearly state whether the output is fixed-length or variable-length
 - test the method on images from different classes
