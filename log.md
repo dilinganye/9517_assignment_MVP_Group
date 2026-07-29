@@ -30,6 +30,15 @@ When this file is updated, use this format:
 - Selection: best validation Top-1 was 0.2458 at epoch 19.
 - Final test: the selected checkpoint achieved Top-1 0.2440 and Top-5 0.4912 on the held-out test set. Do not tune or rerun test-based model selection.
 
+## PR #51 - Add continual masking and trajectories
+
+- Author: xuanzhougu
+- Branch: `agent/cl-mask-and-trajectories`
+- PR created: 2026-07-29 20:19:36 AEST
+- PR merged: pending
+- Summary: mask future unseen logits only during class-incremental validation, keeping all seen classes available without a task-specific label set. Add an offline training-history plotter with loss and Top-1 curves marked by task boundaries. Existing training and held-out test artifacts remain unchanged.
+- Validation: full lightweight CI-equivalent smoke suite, Python compilation, CPU future-logit mask check, synthetic trajectory PNG generation, and `git diff --check` passed.
+
 ## PR #44 - Add scratch Grad-CAM evidence
 
 - Author: xuanzhougu
