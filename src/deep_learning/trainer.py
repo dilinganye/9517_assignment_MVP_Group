@@ -10,7 +10,26 @@ from torch.optim import Optimizer
 from src.deep_learning.checkpoint import save_checkpoint
 
 
-def _run_epoch(model, data_loader, criterion, device, optimizer=None):
+def mask_future_class_logits(logits, targets, seen_class_count):
+    """Mask future classes while retaining every class learned so far."""
+
+    if seen_class_count is None:
+        return logits
+    if logits.ndim != 2:
+        raise ValueError("logits must have shape [batch_size, num_classes]")
+    if not 1 <= seen_class_count <= logits.size(1):
+        raise ValueError("seen_class_count must be within the classifier output range")
+    if targets.numel() and (targets.min() < 0 or targets.max() >= seen_class_count):
+        raise ValueError("validation targets must belong to the seen classes")
+    if seen_class_count == logits.size(1):
+        return logits
+
+    masked_logits = logits.clone()
+    masked_logits[:, seen_class_count:] = float("-inf")
+    return masked_logits
+
+
+def _run_epoch(model, data_loader, criterion, device, optimizer=None, seen_class_count=None):
     """Run one training or validation epoch and return loss and Top-1 metrics."""
 
     is_training = optimizer is not None
@@ -28,7 +47,7 @@ def _run_epoch(model, data_loader, criterion, device, optimizer=None):
             if is_training:
                 optimizer.zero_grad(set_to_none=True)
 
-            outputs = model(inputs)
+            outputs = mask_future_class_logits(model(inputs), targets, seen_class_count)
             loss = criterion(outputs, targets)
 
             if is_training:
@@ -56,11 +75,17 @@ def train_one_epoch(model, data_loader, optimizer: Optimizer, device, criterion=
     return _run_epoch(model, data_loader, criterion, torch.device(device), optimizer)
 
 
-def validate_one_epoch(model, data_loader, device, criterion=None):
-    """Validate a model for one epoch using cross-entropy by default."""
+def validate_one_epoch(model, data_loader, device, criterion=None, seen_class_count=None):
+    """Validate with optional class-incremental masking of future logits."""
 
     criterion = criterion or nn.CrossEntropyLoss()
-    return _run_epoch(model, data_loader, criterion, torch.device(device))
+    return _run_epoch(
+        model,
+        data_loader,
+        criterion,
+        torch.device(device),
+        seen_class_count=seen_class_count,
+    )
 
 
 def fit_scratch_model(

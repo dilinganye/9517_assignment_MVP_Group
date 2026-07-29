@@ -16,10 +16,15 @@ for fixed held-out test evaluation.
 sequential no-replay baseline. Its CUDA entry point is
 `scripts/train_continual_no_replay.py`; it trains on the current task only and
 writes task-boundary validation or explicitly requested held-out test matrix
-artifacts after each task.
+artifacts after each task. During task-boundary validation, predictions are
+restricted to all classes seen so far, not to a task-specific label set.
 
 `continual_replay.py` provides deterministic class-balanced memory selection,
 inverse-frequency sampling weights, and replay-specific resume guards.
 `scripts/train_continual_replay.py` trains on the current task plus `M` stored
 examples per old class, then saves the same task-boundary metrics together
 with memory manifests and summaries.
+
+`scripts/plot_continual_trajectories.py` reads two saved validation-run
+`training_history.csv` files and writes a four-panel loss and Top-1 trajectory
+figure with task boundaries. It does not load a checkpoint, image, or GPU.

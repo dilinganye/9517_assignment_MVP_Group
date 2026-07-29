@@ -312,6 +312,7 @@ def main():
 
     global_epoch = len(history_rows)
     for task_id in range(start_task_id, num_tasks):
+        seen_class_count = (task_id + 1) * config.CONTINUAL_CLASSES_PER_TASK
         train_loader = create_loader(
             "train",
             task_id,
@@ -330,7 +331,12 @@ def main():
         for epoch_in_task in range(1, args.epochs_per_task + 1):
             epoch_start = time.perf_counter()
             train_metrics = train_one_epoch(model, train_loader, optimizer, device)
-            current_val_metrics = validate_one_epoch(model, current_val_loader, device)
+            current_val_metrics = validate_one_epoch(
+                model,
+                current_val_loader,
+                device,
+                seen_class_count=seen_class_count,
+            )
             global_epoch += 1
             history_rows.append(
                 {
@@ -358,6 +364,7 @@ def main():
                 model,
                 evaluation_loader,
                 device,
+                seen_class_count=seen_class_count,
             )["top1"]
         record_accuracy_row(matrix, task_id, task_accuracies)
         summary_rows.append(summarize_after_task(matrix, task_id))
