@@ -6,9 +6,6 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-completed-2ea44f" alt="Completed">
-  <img src="https://img.shields.io/badge/dataset-iNaturalist--2021-4c78a8" alt="iNaturalist-2021">
-  <img src="https://img.shields.io/badge/classes-500-8a63d2" alt="500 classes">
-  <img src="https://img.shields.io/badge/validation-GitHub%20Actions-2088ff" alt="GitHub Actions">
 </p>
 
 <p align="center">
