@@ -292,6 +292,127 @@ outputs/
     └── test_combined_features.npz
 ```
 
+## How to Run
+
+Run the notebooks from the project repository.
+
+First, install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Make sure the dataset files are available in:
+
+```text
+data/raw/
+data/processed/
+```
+
+The processed dataset folder should contain:
+
+```text
+train.csv
+val.csv
+test.csv
+```
+
+The feature notebooks can be opened from:
+
+```text
+src/traditional/features/
+```
+
+For testing the individual feature methods, run:
+
+```text
+hog.ipynb
+color.ipynb
+combine.ipynb
+sift.ipynb
+```
+
+To extract the combined HOG and RGB colour features for the complete dataset, run:
+
+```text
+features.ipynb
+```
+
+This notebook creates:
+
+```text
+outputs/traditional_features/
+├── train_combined_features.npz
+├── validation_combined_features.npz
+└── test_combined_features.npz
+```
+
+There are two ways to prepare the feature files for the traditional classifier.
+
+### Option 1: Extract the features locally
+
+Run:
+
+```text
+features.ipynb
+```
+
+Then run:
+
+```text
+cache.ipynb
+```
+
+### Option 2: Use the shared feature files
+
+Download the `.npz` files from the OneDrive link in this README and place them in:
+
+```text
+outputs/traditional_features/
+```
+
+In this case, `features.ipynb` does not need to be run again. The files can be loaded directly with:
+
+```text
+cache.ipynb
+```
+
+The loaded arrays are prepared as:
+
+```text
+X_train, y_train, train_paths
+X_val, y_val, val_paths
+X_test, y_test, test_paths
+```
+
+These arrays can then be used by:
+
+```text
+src/traditional/classifier/traditional_classifier.ipynb
+```
+
+Before committing notebook changes, restart the kernel and run all cells from top to bottom to confirm that no errors occur.
+
+## Implementation and Code Sources
+
+The feature extraction pipeline, dataset loading, feature combination, validation, file saving, and cache loading code were implemented for this project.
+
+The traditional feature algorithms use standard implementations from the following Python libraries:
+
+- HOG feature extraction uses `skimage.feature.hog` from scikit-image.
+- SIFT keypoint detection and descriptor extraction use `cv2.SIFT_create` from OpenCV.
+- RGB colour histograms use NumPy histogram operations.
+- Image loading and RGB conversion use Pillow.
+- Data tables and CSV files are handled with pandas.
+- Feature arrays and saved `.npz` files use NumPy.
+- Feature and image visualisations use Matplotlib.
+
+The HOG and SIFT algorithms were not reimplemented from scratch. Their standard library implementations were used through the public APIs listed above.
+
+No pretrained model is used in this traditional feature extraction module.
+
+No external training code or third-party project repository is included in this folder.
+
 ## Maintenance
 
 When adding a new feature:
