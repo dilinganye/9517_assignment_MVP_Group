@@ -10,7 +10,11 @@ are implemented by the sequential training scripts.
 `continual_metrics.py` defines the task-by-task accuracy matrix contract used
 after every completed task: current-task, old-task, seen-task accuracy, and
 average forgetting. The same contract is used for validation comparisons and
-for fixed held-out test evaluation.
+for fixed held-out test evaluation. Masking-corrected validation trajectories
+are the source for average-forgetting analysis. Fixed held-out results are used
+only for final current/old/seen accuracy after all classes have been observed,
+because historical held-out trajectories produced before future-class masking
+are not comparable for forgetting.
 
 `continual_no_replay.py` guards task-boundary resume settings for the
 sequential no-replay baseline. Its CUDA entry point is

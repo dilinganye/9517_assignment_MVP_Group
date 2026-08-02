@@ -96,14 +96,34 @@ The scratch result was obtained from the best validation checkpoint (validation 
 
 ### Continual-Learning Study
 
-The advanced experiment uses a deterministic 100-class subset split into 10 sequential tasks. It keeps the classifier head class-incremental and evaluates all classes observed so far after each task.
+The advanced experiment uses a deterministic 100-class subset split into 10 sequential tasks. It keeps the classifier head class-incremental and, at every task boundary, evaluates all classes observed so far without providing the task identity. Future unseen-class logits are masked during these task-boundary evaluations.
 
-| Final held-out condition | Current-task accuracy | Old-task accuracy | Seen-task accuracy | Average forgetting |
-| --- | ---: | ---: | ---: | ---: |
-| Sequential fine-tuning without replay | 16.00% | 0.00% | 1.60% | 0.2600 |
-| Replay, 5 images per old class, class-balanced sampling | 28.00% | 1.89% | 4.50% | 0.3322 |
+The following masking-corrected validation results are measured after the tenth task (task index 9). Average forgetting is reported as a fraction and is the standard peak-to-final measure across previously learned tasks.
 
-This study is reported separately from the required 500-class baselines. The held-out values above are from the scratch branch; the pretrained E04 branch uses the same task map and writes its own task matrices and comparison outputs. The saved artifacts include task-by-task accuracy matrices, current/old/seen accuracy curves, average-forgetting curves, replay-memory summaries, and final metric tables.
+| Pipeline | Condition | Current-task accuracy | Old-task accuracy | Seen-task accuracy | Avg. forgetting (fraction) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Scratch | Sequential fine-tuning without replay | 15.00% | 0.00% | 1.50% | 0.2767 |
+| Scratch | M=5 replay with inverse-frequency sampling | 35.00% | 1.44% | 4.80% | 0.3489 |
+| Pretrained | Sequential fine-tuning without replay | 83.00% | 0.00% | 8.30% | 0.8789 |
+| Pretrained | M=2 class-balanced replay | 77.00% | 21.22% | 26.80% | 0.6800 |
+| Pretrained | M=5 class-balanced replay | 87.00% | 46.44% | 50.50% | 0.4078 |
+
+The scratch and pretrained branches share the class order and task structure but use different optimisation and replay settings. They are therefore reported as complete pipelines, rather than as an experiment that attributes their gap to pretraining alone. The pretrained branch supplies the clear M=0 to M=2 to M=5 memory-size trade-off: more replay memory improves final seen-task accuracy and reduces standard forgetting.
+
+#### Interpreting the Scratch Results
+
+The scratch result is an informative catastrophic-forgetting result, not evidence that the pipeline is generally non-functional. A 20-epoch 100-class joint-training control reached 25.8% validation Top-1 for the randomly initialized ResNet18, compared with 74.7% for the pretrained joint-training configuration. This confirms that the scratch route can learn the subset, while also showing that its representation is much weaker under these respective configurations.
+
+Sequential fine-tuning then strongly overwrites the scratch representation: without replay, old-task accuracy is zero after the tenth task. M=5 replay improves absolute final retention on validation, from 0.00% to 1.44% old-task accuracy and from 1.50% to 4.80% seen-task accuracy, but it does not reduce peak-to-final average forgetting. This is not contradictory: replay can raise an earlier task's best accuracy while its final accuracy remains low, increasing the difference used by the forgetting metric even as final absolute retention improves. The small memory budget is also limited relative to the 100-class sequential problem. Future-class masking corrects the evaluation competition set; it does not itself prevent overwriting of old-class representations.
+
+The frozen held-out test is retained only for final absolute retention after all 100 classes have been observed. Average forgetting is intentionally omitted because the original held-out task-boundary trajectories preceded future-class masking; masking does not affect final-task absolute accuracies once all 100 classes are visible, but it does affect the historical values used to compute forgetting.
+
+| Scratch held-out test condition after the tenth task | Current-task accuracy | Old-task accuracy | Seen-task accuracy |
+| --- | ---: | ---: | ---: |
+| Sequential fine-tuning without replay | 16.00% | 0.00% | 1.60% |
+| M=5 replay with inverse-frequency sampling | 28.00% | 1.89% | 4.50% |
+
+This study is reported separately from the required 500-class baselines. Saved artifacts include task-by-task accuracy matrices, current/old/seen accuracy curves, masking-corrected forgetting curves, replay-memory summaries, loss and Top-1 trajectories, and final metric tables.
 
 ## Repository Layout
 
@@ -122,8 +142,7 @@ This study is reported separately from the required 500-class baselines. The hel
 |   |-- advanced/            # Continual-learning components
 |   |-- evaluation.py        # Shared classification metrics
 |   `-- gradcam_selection.py # Reproducible Grad-CAM sample selection
-|-- requirements.txt
-`-- log.md                   # Project maintenance record
+`-- requirements.txt
 ```
 
 ## Team Contributions
